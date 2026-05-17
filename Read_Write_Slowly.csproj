@@ -90,9 +90,12 @@
     <Compile Include="Genre.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models_\User.cs" />
     <Compile Include="ReadingList.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels_\LoginViewModel.cs" />
+    <Compile Include="Repositories_\UserRepository.cs" />
     <Compile Include="Review.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
@@ -126,6 +129,7 @@
     <Compile Include="Users.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels_\BaseViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -196,9 +200,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models_\" />
-    <Folder Include="Repositories_\" />
-    <Folder Include="ViewModels_\" />
     <Folder Include="View_\" />
   </ItemGroup>
   <ItemGroup>
