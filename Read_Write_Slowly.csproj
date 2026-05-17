@@ -90,10 +90,14 @@
     <Compile Include="Genre.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models_\Book.cs" />
+    <Compile Include="Models_\Genre.cs" />
     <Compile Include="Models_\User.cs" />
     <Compile Include="ReadingList.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Repositories_\BookRepository.cs" />
+    <Compile Include="ViewModels_\CatalogViewModel.cs" />
     <Compile Include="ViewModels_\LoginViewModel.cs" />
     <Compile Include="Repositories_\UserRepository.cs" />
     <Compile Include="Review.cs">
@@ -130,6 +134,9 @@
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModels_\BaseViewModel.cs" />
+    <Compile Include="View_\CatalogPage.xaml.cs">
+      <DependentUpon>CatalogPage.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -142,6 +149,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View_\CatalogPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -199,9 +210,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="View_\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="ShutIKrolDB.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
