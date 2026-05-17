@@ -93,12 +93,22 @@
     <Compile Include="Models_\Book.cs" />
     <Compile Include="Models_\Genre.cs" />
     <Compile Include="Models_\Review.cs" />
+    <Compile Include="Models_\RoleApplicationInfo.cs" />
+    <Compile Include="Models_\UnfreezeRequestInfo.cs" />
     <Compile Include="Models_\User.cs" />
     <Compile Include="ReadingList.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Repositories_\AdminRepository.cs" />
+    <Compile Include="Repositories_\AuthorRepository.cs" />
+    <Compile Include="Repositories_\AuthRepository.cs" />
     <Compile Include="Repositories_\BookDetailsRepository.cs" />
     <Compile Include="Repositories_\BookRepository.cs" />
+    <Compile Include="Repositories_\ProfileRepository.cs" />
+    <Compile Include="Repositories_\ReadingListRepository.cs" />
+    <Compile Include="ViewModels_\AdminViewModel.cs" />
+    <Compile Include="ViewModels_\AuthorViewModel.cs" />
+    <Compile Include="ViewModels_\AuthViewModel.cs" />
     <Compile Include="ViewModels_\BookDetailsViewModel.cs" />
     <Compile Include="ViewModels_\CatalogViewModel.cs" />
     <Compile Include="ViewModels_\LoginViewModel.cs" />
@@ -137,11 +147,25 @@
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModels_\BaseViewModel.cs" />
+    <Compile Include="ViewModels_\ProfileViewModel.cs" />
+    <Compile Include="ViewModels_\UserListsViewModel.cs" />
+    <Compile Include="View_\AdminPage.xaml.cs">
+      <DependentUpon>AdminPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View_\AuthorPage.xaml.cs">
+      <DependentUpon>AuthorPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View_\BookPage.xaml.cs">
       <DependentUpon>BookPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View_\CatalogPage.xaml.cs">
       <DependentUpon>CatalogPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View_\ProfilePage.xaml.cs">
+      <DependentUpon>ProfilePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View_\UserListsPage.xaml.cs">
+      <DependentUpon>UserListsPage.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -155,11 +179,27 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View_\AdminPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View_\AuthorPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View_\BookPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View_\CatalogPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View_\ProfilePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View_\UserListsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

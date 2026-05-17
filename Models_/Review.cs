@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Read_Write_Slowly.Models_
 {
@@ -16,5 +12,6 @@ namespace Read_Write_Slowly.Models_
         public double Rating { get; set; }
         public bool IsFrozen { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string BookTitle { get; set; }
     }
 }

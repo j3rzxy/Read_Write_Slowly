@@ -1,0 +1,94 @@
+﻿using Read_Write_Slowly.Models_;
+using Read_Write_Slowly.Repositories_;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+
+namespace Read_Write_Slowly.ViewModels_
+{
+    public class AdminViewModel : BaseViewModel
+    {
+        private readonly AdminRepository _repository;
+
+        // Коллекции данных для таблиц UI
+        public ObservableCollection<RoleApplicationInfo> RoleApplications { get; set; }
+        public ObservableCollection<UnfreezeRequestInfo> UnfreezeRequests { get; set; }
+
+        // Команды для управления ролями
+        public ICommand ApproveRoleCommand { get; }
+        public ICommand RejectRoleCommand { get; }
+
+        // Команды для управления разморозкой
+        public ICommand ApproveUnfreezeCommand { get; }
+        public ICommand RejectUnfreezeCommand { get; }
+
+        public AdminViewModel()
+        {
+            _repository = new AdminRepository();
+            RoleApplications = new ObservableCollection<RoleApplicationInfo>();
+            UnfreezeRequests = new ObservableCollection<UnfreezeRequestInfo>();
+
+            // Инициализация команд
+            ApproveRoleCommand = new RelayCommand<RoleApplicationInfo>(ApproveRole);
+            RejectRoleCommand = new RelayCommand<RoleApplicationInfo>(RejectRole);
+            ApproveUnfreezeCommand = new RelayCommand<UnfreezeRequestInfo>(ApproveUnfreeze);
+            RejectUnfreezeCommand = new RelayCommand<UnfreezeRequestInfo>(RejectUnfreeze);
+
+            RefreshAll();
+        }
+
+        private void RefreshAll()
+        {
+            // Обновляем список ролей
+            RoleApplications.Clear();
+            var apps = _repository.GetPendingRoleApplications();
+            foreach (var a in apps) RoleApplications.Add(a);
+
+            // Обновляем список апелляций
+            UnfreezeRequests.Clear();
+            var reqs = _repository.GetActiveUnfreezeRequests();
+            foreach (var r in reqs) UnfreezeRequests.Add(r);
+        }
+
+        // 1. Одобрить перевод в Авторы
+        private void ApproveRole(RoleApplicationInfo app)
+        {
+            if (app == null) return;
+            _repository.ProcessRoleApplication(app.RoleApplicationId, app.UserId, app.RequestedRoleId, true);
+            MessageBox.Show($"Пользователь {app.UserDisplayName} успешно переведен в роль {app.RequestedRoleName}!", "Успех");
+            RefreshAll();
+        }
+
+        // 2. Отклонить перевод в Авторы
+        private void RejectRole(RoleApplicationInfo app)
+        {
+            if (app == null) return;
+            _repository.ProcessRoleApplication(app.RoleApplicationId, app.UserId, app.RequestedRoleId, false);
+            MessageBox.Show("Заявка отклонена.", "Инфо");
+            RefreshAll();
+        }
+
+        // 3. Одобрить разморозку (вернуть доступ)
+        private void ApproveUnfreeze(UnfreezeRequestInfo req)
+        {
+            if (req == null) return;
+            _repository.ProcessUnfreezeRequest(req, true);
+            MessageBox.Show($"{req.TargetName} успешно разморожен(а) для пользователя {req.UserDisplayName}.", "Выполнено");
+            RefreshAll();
+        }
+
+        // 4. Отклонить разморозку (оставить бан)
+        private void RejectUnfreeze(UnfreezeRequestInfo req)
+        {
+            if (req == null) return;
+            _repository.ProcessUnfreezeRequest(req, false);
+            MessageBox.Show("Апелляция отклонена. Ограничения остаются в силе.", "Инфо");
+            RefreshAll();
+        }
+    }
+}
