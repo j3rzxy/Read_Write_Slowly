@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Read_Write_Slowly.Models_;
+using Read_Write_Slowly.ViewModels_;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,19 @@ namespace Read_Write_Slowly
     /// </summary>
     public partial class MainWindow : Window
     {
+        // Конструктор по умолчанию (нужен для дизайнера Visual Studio)
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        // Основной конструктор, вызываемый при успешном входе
+        public MainWindow(User authenticatedUser)
+        {
+            InitializeComponent();
+
+            // Привязываем DataContext к MainViewModel, передавая пользователя
+            this.DataContext = new MainViewModel(authenticatedUser);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Read_Write_Slowly.Repositories_
                 string query = @"
                     SELECT UserId, Login, Email, DisplayName, RegistrationDate, IsFrozen, RoleId 
                     FROM Users 
-                    WHERE (Login = @loginOrEmail OR Email = @loginOrEmail) AND Password = @password";
+                    WHERE (Login = @loginOrEmail OR Email = @loginOrEmail) AND PasswordHash = @password";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -85,7 +85,7 @@ namespace Read_Write_Slowly.Repositories_
 
                 // Вставка нового пользователя. По умолчанию: RoleId = 1 (Читатель), IsFrozen = 0 (Не заморожен)
                 string insertQuery = @"
-                    INSERT INTO Users (UserId, Login, Email, Password, DisplayName, RegistrationDate, IsFrozen, RoleId) 
+                    INSERT INTO Users (UserId, Login, Email, PasswordHash, DisplayName, RegistrationDate, IsFrozen, RoleId) 
                     VALUES (@userId, @login, @email, @password, @displayName, @regDate, 0, 1)";
 
                 using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))

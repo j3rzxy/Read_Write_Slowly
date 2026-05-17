@@ -1,10 +1,5 @@
 ﻿using Read_Write_Slowly.Models_;
 using Read_Write_Slowly.Repositories_;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -104,14 +99,11 @@ namespace Read_Write_Slowly.ViewModels_
                 User user = _repository.Login(LoginOrEmail, password);
                 if (user != null)
                 {
-                    // Сохраняем пользователя в глобальную сессию приложения (опционально)
-                    // Application.Current.Properties["CurrentUser"] = user;
-
                     MessageBox.Show($"Добро пожаловать, {user.DisplayName}!", "Успешный вход");
 
                     // Открываем Главное окно приложения (MainWindow)
-                    // MainWindow mainWindow = new MainWindow();
-                    // mainWindow.Show();
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.Show();
 
                     // Закрываем окно авторизации
                     currentWindow?.Close();

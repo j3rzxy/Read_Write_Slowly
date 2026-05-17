@@ -87,10 +87,12 @@
     <Compile Include="Complaint.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ParamConverter.cs" />
     <Compile Include="Genre.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_\Book.cs" />
+    <Compile Include="Models_\ComplaintInfo.cs" />
     <Compile Include="Models_\Genre.cs" />
     <Compile Include="Models_\Review.cs" />
     <Compile Include="Models_\RoleApplicationInfo.cs" />
@@ -147,13 +149,18 @@
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModels_\BaseViewModel.cs" />
+    <Compile Include="ViewModels_\MainViewModel.cs" />
     <Compile Include="ViewModels_\ProfileViewModel.cs" />
+    <Compile Include="ViewModels_\RelayCommand.cs" />
     <Compile Include="ViewModels_\UserListsViewModel.cs" />
     <Compile Include="View_\AdminPage.xaml.cs">
       <DependentUpon>AdminPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View_\AuthorPage.xaml.cs">
       <DependentUpon>AuthorPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View_\AuthWindow.xaml.cs">
+      <DependentUpon>AuthWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View_\BookPage.xaml.cs">
       <DependentUpon>BookPage.xaml</DependentUpon>
@@ -167,7 +174,11 @@
     <Compile Include="View_\UserListsPage.xaml.cs">
       <DependentUpon>UserListsPage.xaml</DependentUpon>
     </Compile>
-    <Page Include="MainWindow.xaml">
+    <Page Include="View_\AuthWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View_\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -175,7 +186,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="View_\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>

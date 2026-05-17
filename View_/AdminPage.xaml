@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="Read_Write_Slowly.View_.AdminPage"
-xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
@@ -79,6 +79,53 @@ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                                                     Command="{Binding DataContext.RejectUnfreezeCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}"
                                                     Background="#607D8B" BorderBrush="#607D8B" Height="28" Padding="10,0"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Жалобы от пользователей">
+                <Grid Margin="15">
+                    <DataGrid ItemsSource="{Binding Complaints}" AutoGenerateColumns="False" CanUserAddRows="False" Background="White" IsReadOnly="True" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="№" Binding="{Binding ComplaintId}" Width="50"/>
+                            <DataGridTextColumn Header="От кого" Binding="{Binding ReporterName}" Width="150"/>
+                            <DataGridTextColumn Header="Тип объекта" Binding="{Binding TargetType}" Width="100"/>
+
+                            <DataGridTemplateColumn Header="Содержание объекта" Width="200">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding TargetDescription}" TextWrapping="Wrap" MaxHeight="60" TextTrimming="CharacterEllipsis"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Суть жалобы" Width="250">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Reason}" TextWrapping="Wrap" Foreground="DarkRed" FontWeight="SemiBold"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn Header="Дата" Binding="{Binding CreatedAt}" Width="150"/>
+
+                            <DataGridTemplateColumn Header="Действия" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Принять (Заморозить)" 
+                                        Command="{Binding DataContext.ApproveComplaintCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Background="#E53935" BorderBrush="#E53935" Height="28" Margin="0,0,8,0" Padding="10,0"/>
+                                            <Button Content="Отклонить" 
+                                        Command="{Binding DataContext.RejectComplaintCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}" Foreground="Gray" BorderBrush="Gray" Height="28" Padding="10,0"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

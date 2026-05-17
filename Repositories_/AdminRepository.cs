@@ -98,8 +98,99 @@ namespace Read_Write_Slowly.Repositories_
                 }
             }
         }
+        public List<ComplaintInfo> GetComplaints()
+        {
+            var list = new List<ComplaintInfo>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
 
-        // 3. Получить все запросы на разморозку
+                // LEFT JOIN позволяет вытащить Название книги (если жалоба на книгу) 
+                // ИЛИ текст отзыва (если жалоба на отзыв)
+                string query = @"
+            SELECT c.ComplaintId, u.DisplayName, c.TargetType, c.TargetId, c.Reason, c.CreatedAt,
+                   ISNULL(b.Title, ISNULL(r.Text, 'Удаленный объект')) AS TargetDescription
+            FROM Complaint c
+            JOIN Users u ON c.UserId = u.UserId
+            LEFT JOIN Book b ON c.TargetType = 'book' AND c.TargetId = b.BookId
+            LEFT JOIN Review r ON c.TargetType = 'review' AND c.TargetId = r.ReviewId
+            ORDER BY c.ComplaintId ASC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new ComplaintInfo
+                        {
+                            ComplaintId = reader.GetInt32(0),
+                            ReporterName = reader.GetString(1),
+                            TargetType = reader.GetString(2),
+                            TargetId = reader.GetInt32(3),
+                            Reason = reader.GetString(4),
+                            CreatedAt = reader.GetString(5),
+                            TargetDescription = reader.GetString(6)
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        // 3. Обработка жалобы (Удовлетворить или Отклонить)
+        public void ProcessComplaint(ComplaintInfo complaint, bool approve)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Если жалоба одобрена, замораживаем объект
+                        if (approve)
+                        {
+                            if (complaint.TargetType == "book")
+                            {
+                                string freezeBookQuery = "UPDATE Book SET IsFrozen = 1 WHERE BookId = @targetId";
+                                using (SqlCommand cmd = new SqlCommand(freezeBookQuery, conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@targetId", complaint.TargetId);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+                            else if (complaint.TargetType == "review")
+                            {
+                                // Предполагается, что вы добавили поле IsFrozen в таблицу Review
+                                string freezeReviewQuery = "UPDATE Review SET IsFrozen = 1 WHERE ReviewId = @targetId";
+                                using (SqlCommand cmd = new SqlCommand(freezeReviewQuery, conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@targetId", complaint.TargetId);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+                        }
+
+                        // В любом случае (одобрили или отклонили) удаляем жалобу из очереди
+                        string deleteComplaintQuery = "DELETE FROM Complaint WHERE ComplaintId = @complaintId";
+                        using (SqlCommand cmd = new SqlCommand(deleteComplaintQuery, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@complaintId", complaint.ComplaintId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        // 4. Получить все запросы на разморозку
         public List<UnfreezeRequestInfo> GetActiveUnfreezeRequests()
         {
             var list = new List<UnfreezeRequestInfo>();
@@ -139,7 +230,7 @@ namespace Read_Write_Slowly.Repositories_
             return list;
         }
 
-        // 4. Выполнение разморозки (и удаление обработанного запроса)
+        // 5. Выполнение разморозки (и удаление обработанного запроса)
         public void ProcessUnfreezeRequest(UnfreezeRequestInfo request, bool approve)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

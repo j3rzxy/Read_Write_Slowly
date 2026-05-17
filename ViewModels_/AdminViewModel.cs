@@ -1,11 +1,6 @@
 ﻿using Read_Write_Slowly.Models_;
 using Read_Write_Slowly.Repositories_;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -27,11 +22,20 @@ namespace Read_Write_Slowly.ViewModels_
         public ICommand ApproveUnfreezeCommand { get; }
         public ICommand RejectUnfreezeCommand { get; }
 
+        public ObservableCollection<ComplaintInfo> Complaints { get; set; }
+
+        public ICommand ApproveComplaintCommand { get; }
+        public ICommand RejectComplaintCommand { get; }
+
         public AdminViewModel()
         {
             _repository = new AdminRepository();
             RoleApplications = new ObservableCollection<RoleApplicationInfo>();
             UnfreezeRequests = new ObservableCollection<UnfreezeRequestInfo>();
+            
+            Complaints = new ObservableCollection<ComplaintInfo>();
+            ApproveComplaintCommand = new RelayCommand<ComplaintInfo>(ApproveComplaint);
+            RejectComplaintCommand = new RelayCommand<ComplaintInfo>(RejectComplaint);
 
             // Инициализация команд
             ApproveRoleCommand = new RelayCommand<RoleApplicationInfo>(ApproveRole);
@@ -53,6 +57,11 @@ namespace Read_Write_Slowly.ViewModels_
             UnfreezeRequests.Clear();
             var reqs = _repository.GetActiveUnfreezeRequests();
             foreach (var r in reqs) UnfreezeRequests.Add(r);
+
+            //Обновляем список жалоб
+            Complaints.Clear();
+            var complaintsList = _repository.GetComplaints();
+            foreach (var c in complaintsList) Complaints.Add(c);
         }
 
         // 1. Одобрить перевод в Авторы
@@ -89,6 +98,24 @@ namespace Read_Write_Slowly.ViewModels_
             _repository.ProcessUnfreezeRequest(req, false);
             MessageBox.Show("Апелляция отклонена. Ограничения остаются в силе.", "Инфо");
             RefreshAll();
+        }
+
+        // 5. Одобрить разморозку (оставить бан)
+        private void ApproveComplaint(ComplaintInfo complaint)
+        {
+            if (complaint == null) return;
+            _repository.ProcessComplaint(complaint, true);
+            MessageBox.Show($"Жалоба одобрена. Объект (ID: {complaint.TargetId}) успешно заморожен.", "Выполнено");
+            RefreshAll();
+        }
+
+        private void RejectComplaint(ComplaintInfo complaint)
+        {
+            if (complaint == null) return;
+            _repository.ProcessComplaint(complaint, false);
+            MessageBox.Show("Жалоба отклонена и удалена из очереди.", "Инфо");
+            RefreshAll();
+        }
         }
     }
 }

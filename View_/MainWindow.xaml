@@ -1,0 +1,94 @@
+﻿<Window x:Class="Read_Write_Slowly.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewmodels="clr-namespace:Read_Write_Slowly.ViewModels_"
+        xmlns:views="clr-namespace:Read_Write_Slowly.View_"
+        Title="Шут и Кроль — Электронная Библиотека" 
+        Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F6FA">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodels:AuthorViewModel}">
+            <views:AuthorPage />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewmodels:AdminViewModel}">
+            <views:AdminPage />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#1E1E2D" CornerRadius="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="20,30,20,30" HorizontalAlignment="Center">
+                    <materialDesign:PackIcon Kind="AccountCircle" Width="60" Height="60" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding CurrentUser.DisplayName}" Foreground="White" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,2"/>
+                    <TextBlock Text="{Binding CurrentUser.Email}" Foreground="#A2A3B7" FontSize="12" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Margin="10,0">
+
+                    <Button Command="{Binding OpenCatalogCommand}"
+                            Style="{StaticResource MaterialDesignFlatMidBgButton}" 
+                            Background="Transparent" BorderBrush="Transparent" Foreground="White"
+                            Height="48" HorizontalContentAlignment="Left" Margin="0,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="BookOpenPageVariant" Width="22" Height="22" VerticalAlignment="Center"/>
+                            <TextBlock Text="Каталог книг" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding OpenAuthorPanelCommand}"
+                            Visibility="{Binding IsAuthorMenuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Style="{StaticResource MaterialDesignFlatMidBgButton}" 
+                            Background="Transparent" BorderBrush="Transparent" Foreground="White"
+                            Height="48" HorizontalContentAlignment="Left" Margin="0,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="PencilEdit" Width="22" Height="22" VerticalAlignment="Center"/>
+                            <TextBlock Text="Моё творчество (Автор)" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding OpenAdminPanelCommand}"
+                            Visibility="{Binding IsAdminMenuVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Style="{StaticResource MaterialDesignFlatMidBgButton}" 
+                            Background="Transparent" BorderBrush="Transparent" Foreground="White"
+                            Height="48" HorizontalContentAlignment="Left" Margin="0,5">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ShieldCrown" Width="22" Height="22" VerticalAlignment="Center"/>
+                            <TextBlock Text="Администрирование" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <Button Grid.Row="2" 
+                        Command="{Binding LogoutCommand}"
+                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                        Style="{StaticResource MaterialDesignFlatButton}" 
+                        Foreground="#F44336" Height="50" Margin="10,20">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Logout" Width="22" Height="22" VerticalAlignment="Center"/>
+                        <TextBlock Text="Выйти из аккаунта" Margin="15,0,0,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <ContentControl Content="{Binding CurrentViewModel}" />
+        </Grid>
+    </Grid>
+</Window>
