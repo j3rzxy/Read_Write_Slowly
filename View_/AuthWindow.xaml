@@ -11,7 +11,8 @@
         Background="#F5F5F5">
 
     <Window.DataContext>
-        <viewmodels.AuthViewModel />
+        <!-- ИСПРАВЛЕНО: было <viewmodels.AuthViewModel /> — точка вместо двоеточия -->
+        <viewmodels:AuthViewModel />
     </Window.DataContext>
 
     <Window.Resources>

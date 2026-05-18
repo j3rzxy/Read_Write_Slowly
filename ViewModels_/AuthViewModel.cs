@@ -102,7 +102,7 @@ namespace Read_Write_Slowly.ViewModels_
                     MessageBox.Show($"Добро пожаловать, {user.DisplayName}!", "Успешный вход");
 
                     // Открываем Главное окно приложения (MainWindow)
-                    MainWindow mainWindow = new MainWindow();
+                    MainWindow mainWindow = new MainWindow(user); // ИСПРАВЛЕНО: передаём user, иначе DataContext = null
                     mainWindow.Show();
 
                     // Закрываем окно авторизации
