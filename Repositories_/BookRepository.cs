@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 
+// ИСПРАВЛЕНО: псевдонимы направляют компилятор к DTO из Models_,
+// а не к EF-сущностям с теми же именами из корневого пространства имён.
+using Book = Read_Write_Slowly.Models_.Book;
+using Genre = Read_Write_Slowly.Models_.Genre;
+
 namespace Read_Write_Slowly.Repositories_
 {
     public class BookRepository
@@ -14,7 +19,7 @@ namespace Read_Write_Slowly.Repositories_
             _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
         }
 
-        // 1. Получение списка жанров для ComboBox
+        // 1. Получение списка жанров для ComboBox фильтрации
         public List<Genre> GetGenres()
         {
             var genres = new List<Genre>();
@@ -34,7 +39,7 @@ namespace Read_Write_Slowly.Repositories_
             return genres;
         }
 
-        // 2. Динамический поиск, фильтрация и сортировка книг
+        // 2. Динамический поиск, фильтрация и сортировка книг для каталога
         public List<Book> GetFilteredBooks(string searchText, int? genreId, string sortBy)
         {
             var books = new List<Book>();
@@ -43,36 +48,27 @@ namespace Read_Write_Slowly.Repositories_
             {
                 conn.Open();
 
-                // Базовый запрос. Считаем среднюю оценку через LEFT JOIN с Review
-                // Исключаем замороженные книги (по ТЗ их видит только автор в кабинете или админ)
+                // ИСПРАВЛЕНО: b.AuthorId → b.AuthorUserId во всех частях запроса
                 string query = @"
                     SELECT b.BookId, b.Title, b.Description, b.CoverPath, 
                            u.DisplayName AS AuthorName, 
                            ISNULL(AVG(r.Rating), 0) AS AvgRating
                     FROM Book b
-                    INNER JOIN Users u ON b.AuthorId = u.UserId
+                    INNER JOIN Users u ON b.AuthorUserId = u.UserId
                     LEFT JOIN Review r ON b.BookId = r.BookId AND r.IsFrozen = 0
                     WHERE b.IsFrozen = 0 ";
 
-                // Динамически добавляем условия
                 if (!string.IsNullOrWhiteSpace(searchText))
-                {
                     query += " AND (b.Title LIKE @search OR u.DisplayName LIKE @search) ";
-                }
 
                 if (genreId.HasValue)
-                {
-                    // Предполагается связь многие-ко-многим через таблицу BookGenre
                     query += " AND b.BookId IN (SELECT BookId FROM BookGenre WHERE GenreId = @genreId) ";
-                }
 
-                // Группировка обязательна для агрегатной функции AVG
                 query += " GROUP BY b.BookId, b.Title, b.Description, b.CoverPath, u.DisplayName ";
 
-                // Добавляем сортировку
                 if (sortBy == "Rating")
                     query += " ORDER BY AvgRating DESC";
-                else // По умолчанию или по имени
+                else
                     query += " ORDER BY b.Title ASC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -103,13 +99,12 @@ namespace Read_Write_Slowly.Repositories_
             return books;
         }
 
-        // 3. Метод добавления книги в список чтения пользователя
+        // 3. Добавление или перемещение книги в список чтения пользователя
         public void AddBookToReadingList(int userId, int bookId, string listStatus)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                // Проверяем, есть ли уже книга в каком-то списке у этого пользователя
                 string checkQuery = "SELECT COUNT(1) FROM ReadingList WHERE UserId = @userId AND BookId = @bookId";
                 bool exists = false;
 
@@ -120,17 +115,9 @@ namespace Read_Write_Slowly.Repositories_
                     exists = (int)checkCmd.ExecuteScalar() > 0;
                 }
 
-                string query;
-                if (exists)
-                {
-                    // Если есть — обновляем статус списка (например: перенесли из "В планах" в "Читаю")
-                    query = "UPDATE ReadingList SET Status = @status WHERE UserId = @userId AND BookId = @bookId";
-                }
-                else
-                {
-                    // Если нет — добавляем новую запись
-                    query = "INSERT INTO ReadingList (UserId, BookId, Status) VALUES (@userId, @bookId, @status)";
-                }
+                string query = exists
+                    ? "UPDATE ReadingList SET Status = @status WHERE UserId = @userId AND BookId = @bookId"
+                    : "INSERT INTO ReadingList (UserId, BookId, Status) VALUES (@userId, @bookId, @status)";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {

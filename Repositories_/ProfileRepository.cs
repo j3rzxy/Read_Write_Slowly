@@ -80,7 +80,7 @@ namespace Read_Write_Slowly.Repositories_
                                 BookTitle = reader.GetString(2), // Название книги для UI
                                 Text = reader.GetString(3),
                                 Rating = reader.GetDouble(4),
-                                CreatedAt = reader.GetString(5)
+                                CreatedAt = reader.GetDateTime(5)
                             });
                         }
                     }

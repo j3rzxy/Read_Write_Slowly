@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 
+// ИСПРАВЛЕНО: псевдонимы явно указывают компилятору использовать DTO из Models_,
+// а не EF-сущности с теми же именами из корневого пространства имён.
+using Book = Read_Write_Slowly.Models_.Book;
+using Review = Read_Write_Slowly.Models_.Review;
+
 namespace Read_Write_Slowly.Repositories_
 {
     public class BookDetailsRepository
@@ -20,14 +25,15 @@ namespace Read_Write_Slowly.Repositories_
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
+                // ИСПРАВЛЕНО: b.AuthorId → b.AuthorUserId (реальное имя столбца в БД)
                 string query = @"
-                    SELECT b.BookId, b.Title, b.Description, b.CoverPath, u.DisplayName, b.AuthorId,
+                    SELECT b.BookId, b.Title, b.Description, b.CoverPath, u.DisplayName,
                            (SELECT STRING_AGG(g.Name, ', ') 
                             FROM BookGenre bg 
                             JOIN Genre g ON bg.GenreId = g.GenreId 
                             WHERE bg.BookId = b.BookId) as Genres
                     FROM Book b
-                    INNER JOIN Users u ON b.AuthorId = u.UserId
+                    INNER JOIN Users u ON b.AuthorUserId = u.UserId
                     WHERE b.BookId = @bookId";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -43,8 +49,9 @@ namespace Read_Write_Slowly.Repositories_
                                 Title = reader.GetString(1),
                                 Description = reader.IsDBNull(2) ? "" : reader.GetString(2),
                                 CoverPath = reader.IsDBNull(3) ? "pack://application:,,,/Resources/no_cover.png" : reader.GetString(3),
-                                AuthorName = reader.GetString(4)
-                                // Дополнительно можно сохранить AuthorId для подачи жалобы на автора
+                                AuthorName = reader.GetString(4),
+                                // ИСПРАВЛЕНО: Genres теперь считывается (индекс 5)
+                                Genres = reader.IsDBNull(5) ? "" : reader.GetString(5)
                             };
                         }
                     }
@@ -78,6 +85,7 @@ namespace Read_Write_Slowly.Repositories_
                             {
                                 ReviewId = reader.GetInt32(0),
                                 UserId = reader.GetInt32(1),
+                                // ИСПРАВЛЕНО: UserDisplayName теперь видно — это поле Models_.Review
                                 UserDisplayName = reader.GetString(2),
                                 Text = reader.GetString(3),
                                 Rating = reader.GetDouble(4),
@@ -110,7 +118,7 @@ namespace Read_Write_Slowly.Repositories_
             }
         }
 
-        // 4. Универсальный метод отправки жалоб (на Книгу, Автора, Отзыв)
+        // 4. Универсальный метод отправки жалоб (на книгу или отзыв)
         public void SendComplaint(int userId, string targetType, int targetId, string reason)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -129,7 +137,7 @@ namespace Read_Write_Slowly.Repositories_
             }
         }
 
-        // 5. Администрирование: Заморозка книги
+        // 5. Администрирование: заморозка книги
         public void FreezeBook(int bookId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -144,7 +152,7 @@ namespace Read_Write_Slowly.Repositories_
             }
         }
 
-        // 6. Администрирование: Заморозка отзыва
+        // 6. Администрирование: заморозка отзыва
         public void FreezeReview(int reviewId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

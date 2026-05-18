@@ -47,7 +47,7 @@
                          materialDesign:HintAssist.Hint="Имя (Никнейм) на сайте" 
                          Margin="0,0,0,15" FontSize="15"
                          materialDesign:TextFieldAssist.HasLeadingIcon="True"
-                         materialDesign:TextFieldAssist.LeadingIcon="AccountCardDetails" />
+                         materialDesign:TextFieldAssist.LeadingIcon="CardAccountDetails" />
 
                 <PasswordBox x:Name="PassBox" 
                              Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"

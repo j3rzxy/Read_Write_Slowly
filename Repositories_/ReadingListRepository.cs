@@ -32,7 +32,7 @@ namespace Read_Write_Slowly.Repositories_
                            ISNULL(AVG(r.Rating), 0) AS AvgRating
                     FROM ReadingList rl
                     INNER JOIN Book b ON rl.BookId = b.BookId
-                    INNER JOIN Users u ON b.AuthorId = u.UserId
+                    INNER JOIN Users u ON b.AuthorUserId = u.UserId
                     LEFT JOIN Review r ON b.BookId = r.BookId AND r.IsFrozen = 0
                     WHERE rl.UserId = @userId AND rl.Status = @status AND b.IsFrozen = 0";
 

@@ -11,5 +11,7 @@
         public bool IsAdmin => RoleId == 3;
         public bool IsAuthor => RoleId == 2;
         public string RoleName { get; set; }
+        public string Email { get; set; }
+        public string RegistrationDate { get; set; }
     }
 }

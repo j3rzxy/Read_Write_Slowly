@@ -116,6 +116,5 @@ namespace Read_Write_Slowly.ViewModels_
             MessageBox.Show("Жалоба отклонена и удалена из очереди.", "Инфо");
             RefreshAll();
         }
-        }
     }
 }

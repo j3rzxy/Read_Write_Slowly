@@ -8,7 +8,9 @@
         public string CoverPath { get; set; } // Путь к картинке (локальный или URL)
         public string AuthorName { get; set; } // Имя автора из связанной таблицы/пользователя
         public double AverageRating { get; set; } // Средняя оценка
-        public bool IsFrozen { get; set; }
+        public int IsFrozen { get; set; }
         public string Genres { get; set; }
+        public string ContentText { get; set; }
+        public int AuthorUserId { get; set; }
     }
 }

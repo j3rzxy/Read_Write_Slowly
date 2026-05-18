@@ -113,7 +113,6 @@
     <Compile Include="ViewModels_\AuthViewModel.cs" />
     <Compile Include="ViewModels_\BookDetailsViewModel.cs" />
     <Compile Include="ViewModels_\CatalogViewModel.cs" />
-    <Compile Include="ViewModels_\LoginViewModel.cs" />
     <Compile Include="Repositories_\UserRepository.cs" />
     <Compile Include="Review.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
