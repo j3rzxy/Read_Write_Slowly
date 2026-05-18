@@ -1,4 +1,6 @@
-﻿namespace Read_Write_Slowly.Models_
+﻿using System.Collections.Generic;
+
+namespace Read_Write_Slowly.Models_
 {
     public class Book
     {
@@ -9,8 +11,8 @@
         public string AuthorName { get; set; } // Имя автора из связанной таблицы/пользователя
         public double AverageRating { get; set; } // Средняя оценка
         public int IsFrozen { get; set; }
-        public string Genres { get; set; }
         public string ContentText { get; set; }
         public int AuthorUserId { get; set; }
+        public List<string> Genres { get; set; } = new List<string>();
     }
 }

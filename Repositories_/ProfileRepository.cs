@@ -77,7 +77,7 @@ namespace Read_Write_Slowly.Repositories_
                             {
                                 ReviewId = reader.GetInt32(0),
                                 BookId = reader.GetInt32(1),
-                                BookTitle = reader.GetString(2), // Название книги для UI
+                                BookTitle = reader.GetString(2),
                                 Text = reader.GetString(3),
                                 Rating = reader.GetDouble(4),
                                 CreatedAt = reader.GetDateTime(5)
