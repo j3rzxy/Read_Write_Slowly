@@ -6,9 +6,20 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
 
+                <!-- 1. Цвета темы + implicit стили для всех контролов -->
+                <materialDesign:BundledTheme BaseTheme="Light"
+                                             PrimaryColor="DeepPurple"
+                                             SecondaryColor="Lime" />
+
+                <!-- 2. Именованные ключи: MaterialDesignTextBox, MaterialDesignFlatButton и т.д. -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+
+                <!-- 3. НОВОЕ: Шим для старых стилей, удалённых в MD 5.x -->
+                <!--    Покрывает: MaterialDesignNavTabControl, MaterialDesignPopupBox, -->
+                <!--    MaterialDesignNavigationRailTabItem и другие obsolete ключи    -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ObsoleteStyles.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

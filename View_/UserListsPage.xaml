@@ -88,7 +88,7 @@
                                                             Command="{Binding DataContext.OpenBookCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                             CommandParameter="{Binding}" />
 
-                                                    <materialDesign:PopupBox Grid.Column="1" Style="{StaticResource MaterialDesignPopupBox}" Margin="5,0,0,0">
+                                                    <materialDesign:PopupBox Grid.Column="1" Margin="5,0,0,0">
                                                         <materialDesign:PopupBox.ToggleContent>
                                                             <materialDesign:PackIcon Kind="Move" Width="24" Height="24" ToolTip="Переместить в другой список"/>
                                                         </materialDesign:PopupBox.ToggleContent>
