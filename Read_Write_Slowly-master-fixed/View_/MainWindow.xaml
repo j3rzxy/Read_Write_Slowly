@@ -34,9 +34,6 @@
         <DataTemplate DataType="{x:Type viewmodels:AdminViewModel}">
             <views:AdminPage />
         </DataTemplate>
-
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-
     </Window.Resources>
 
     <Grid>

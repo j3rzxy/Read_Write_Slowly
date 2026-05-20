@@ -5,6 +5,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <UserControl.Resources>
+        <!-- ИСПРАВЛЕНО: добавлен xmlns:converters и объявлен ресурс MultiValueConverter -->
         <converters:ParamConverter x:Key="MultiValueConverter"/>
     </UserControl.Resources>
 

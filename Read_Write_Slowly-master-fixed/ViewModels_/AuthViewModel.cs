@@ -1,8 +1,8 @@
 ﻿using Read_Write_Slowly.Models_;
 using Read_Write_Slowly.Repositories_;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls;
 
 namespace Read_Write_Slowly.ViewModels_
 {
