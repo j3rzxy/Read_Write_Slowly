@@ -42,7 +42,7 @@ namespace Read_Write_Slowly.Repositories_
                                 Login = reader.GetString(1),
                                 Email = reader.GetString(2),
                                 DisplayName = reader.GetString(3),
-                                RegistrationDate = reader.GetDateTime(4), // В БД nvarchar(255)
+                                RegistrationDate = reader.GetString(4), // В БД nvarchar(255)
                                 IsFrozen = reader.GetBoolean(5),         // В БД bit -> bool
                                 RoleId = reader.GetInt32(6),
                                 RoleName = reader.GetString(7)          // Название роли из таблицы Role
@@ -81,8 +81,7 @@ namespace Read_Write_Slowly.Repositories_
                                 BookId = reader.GetInt32(1),
                                 BookTitle = reader.GetString(2),
                                 Text = reader.GetString(3),
-                                Rating = reader.GetDouble(4),
-                                CreatedAt = reader.GetDateTime(5)
+                                Rating = reader.GetDouble(4)
                             });
                         }
                     }

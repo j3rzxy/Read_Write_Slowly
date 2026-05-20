@@ -47,7 +47,7 @@ namespace Read_Write_Slowly.Repositories_
                             RequestedRoleId = reader.GetInt32(4),
                             RequestedRoleName = reader.GetString(5),
                             Status = reader.GetString(6),
-                            CreatedAt = reader.GetString(7)
+                            CreatedAt = reader.IsDBNull(7) ? "" : reader.GetDateTime(7).ToString("dd.MM.yyyy HH:mm")
                         });
                     }
                 }
@@ -128,7 +128,7 @@ namespace Read_Write_Slowly.Repositories_
                             TargetType = reader.GetString(2),
                             TargetId = reader.GetInt32(3),
                             Reason = reader.GetString(4),
-                            CreatedAt = reader.GetString(5),
+                            CreatedAt = reader.IsDBNull(5) ? "" : reader.GetDateTime(5).ToString("dd.MM.yyyy HH:mm"),
                             TargetDescription = reader.GetString(6)
                         });
                     }
@@ -211,7 +211,10 @@ namespace Read_Write_Slowly.Repositories_
                     while (reader.Read())
                     {
                         string targetType = reader.GetString(3);
-                        string targetName = targetType == "account" ? "Весь аккаунт" : $"Книга: \"{reader.GetString(5)}\"";
+                        string bookTitle = reader.IsDBNull(5) ? "Без названия" : reader.GetString(5);
+                        string targetName = targetType == "account"
+                            ? "Весь аккаунт"
+                            : $"Книга: \"{bookTitle}\"";
 
                         list.Add(new UnfreezeRequestInfo
                         {
@@ -222,7 +225,7 @@ namespace Read_Write_Slowly.Repositories_
                             TargetId = reader.IsDBNull(4) ? (int?)null : reader.GetInt32(4),
                             TargetName = targetName,
                             Reason = reader.GetString(6),
-                            CreatedAt = reader.GetString(7)
+                            CreatedAt = reader.IsDBNull(7) ? "" : reader.GetDateTime(7).ToString("dd.MM.yyyy HH:mm")
                         });
                     }
                 }

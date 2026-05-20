@@ -23,7 +23,7 @@ namespace Read_Write_Slowly.Repositories_
                     SELECT u.UserId, u.Login, u.DisplayName, u.RoleId, u.IsFrozen,
                            u.Email, u.RegistrationDate, r.Name AS RoleName
                     FROM   Users u
-                    JOIN   Roles r ON r.RoleId = u.RoleId
+                    JOIN   Role r ON r.RoleId = u.RoleId
                     WHERE  u.Login = @login AND u.PasswordHash = @passwordHash";
 
                 using (var cmd = new SqlCommand(query, connection))
@@ -51,7 +51,7 @@ namespace Read_Write_Slowly.Repositories_
                     SELECT u.UserId, u.Login, u.DisplayName, u.RoleId, u.IsFrozen,
                            u.Email, u.RegistrationDate, r.Name AS RoleName
                     FROM   Users u
-                    JOIN   Roles r ON r.RoleId = u.RoleId
+                    JOIN   Role r ON r.RoleId = u.RoleId
                     WHERE  u.UserId = @userId";
 
                 using (var cmd = new SqlCommand(query, connection))
@@ -78,7 +78,7 @@ namespace Read_Write_Slowly.Repositories_
                 RoleId = reader.GetInt32(3),
                 IsFrozen = reader.GetBoolean(4),
                 Email = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                RegistrationDate = reader.GetDateTime(6),
+                RegistrationDate = reader.GetString(6),
                 RoleName = reader.IsDBNull(7) ? "" : reader.GetString(7),
             };
         }

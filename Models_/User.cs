@@ -14,6 +14,6 @@ namespace Read_Write_Slowly.Models_
         public bool IsAuthor => RoleId == 2;
         public string RoleName { get; set; }
         public string Email { get; set; }
-        public DateTime RegistrationDate { get; set; }
+        public string RegistrationDate { get; set; }
     }
 }

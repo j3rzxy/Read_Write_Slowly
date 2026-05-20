@@ -41,7 +41,6 @@ namespace Read_Write_Slowly.Repositories_
                                 Login = reader.GetString(1),
                                 Email = reader.GetString(2),
                                 DisplayName = reader.GetString(3),
-                                RegistrationDate = reader.GetDateTime(4),
                                 IsFrozen = reader.GetBoolean(5),
                                 RoleId = reader.GetInt32(6)
                             };

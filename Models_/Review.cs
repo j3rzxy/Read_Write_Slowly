@@ -10,7 +10,7 @@ namespace Read_Write_Slowly.Models_
         public string Text { get; set; }
         public double Rating { get; set; }
         public bool IsFrozen { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string CreatedAt { get; set; }
         public string BookTitle { get; set; }
         public string UserDisplayName { get; set; } // Имя автора отзыва для UI
     }

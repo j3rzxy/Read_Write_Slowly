@@ -92,14 +92,14 @@ namespace Read_Write_Slowly.ViewModels_
 
         private void ComplainBook()
         {
-            _repository.SendComplaint(_currentUser.UserId, "Book", _bookId, "Нарушение / Неприемлемый контент");
+            _repository.SendComplaint(_currentUser.UserId, "book", _bookId, "Нарушение / Неприемлемый контент");
             MessageBox.Show("Жалоба на книгу отправлена администрации.");
         }
 
         private void ComplainReview(Review review)
         {
             if (review == null) return;
-            _repository.SendComplaint(_currentUser.UserId, "Review", review.ReviewId, "Оскорбление / Спам");
+            _repository.SendComplaint(_currentUser.UserId, "review", review.ReviewId, "Оскорбление / Спам");
             MessageBox.Show("Жалоба на отзыв отправлена.");
         }
 

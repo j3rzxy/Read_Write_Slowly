@@ -83,7 +83,6 @@ namespace Read_Write_Slowly.Repositories_
                                 UserDisplayName = reader.GetString(2),
                                 Text = reader.GetString(3),
                                 Rating = reader.GetDouble(4),
-                                CreatedAt = reader.GetDateTime(5),
                                 IsFrozen = reader.GetBoolean(6)
                             });
                         }
