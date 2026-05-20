@@ -20,7 +20,7 @@ namespace Read_Write_Slowly
         public Nullable<int> TargetId { get; set; }
         public string Reason { get; set; }
         public string Status { get; set; }
-        public System.DateTime CreatedAt { get; set; }
+        public string CreatedAt { get; set; }
     
         public virtual Users Users { get; set; }
     }

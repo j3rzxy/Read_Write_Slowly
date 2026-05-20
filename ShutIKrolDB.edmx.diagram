@@ -4,29 +4,30 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="52a5df7519b4447fa66ee3bcf5f0229f" Name="Diagram1">
-        <EntityTypeShape EntityType="ShutIKrolModel.Book" Width="1.5" PointX="6" PointY="5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.BookGenre" Width="1.5" PointX="8.25" PointY="3.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.Complaint" Width="1.5" PointX="5.25" PointY="9.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.Genre" Width="1.5" PointX="6" PointY="1.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.ReadingList" Width="1.5" PointX="8.25" PointY="11.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.Review" Width="1.5" PointX="8.25" PointY="7" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.Role" Width="1.5" PointX="0.75" PointY="8.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.RoleApplication" Width="1.5" PointX="5.25" PointY="13.125" IsExpanded="true" />
+      <Diagram DiagramId="20707e713f594240b7a83ca875de252e" Name="Diagram1">
+        <EntityTypeShape EntityType="ShutIKrolModel.Book" Width="1.5" PointX="5.25" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.BookGenre" Width="1.5" PointX="7.5" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.Complaint" Width="1.5" PointX="5.25" PointY="12.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.Genre" Width="1.5" PointX="5.25" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.ReadingList" Width="1.5" PointX="10.5" PointY="11.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.Review" Width="1.5" PointX="7.5" PointY="15.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.Role" Width="1.5" PointX="0.75" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.RoleApplication" Width="1.5" PointX="8.25" PointY="11.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ShutIKrolModel.sysdiagrams" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.UnfreezeRequest" Width="1.5" PointX="5.25" PointY="19.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShutIKrolModel.Users" Width="1.5" PointX="3" PointY="10.5" IsExpanded="true" />
-        <AssociationConnector Association="ShutIKrolModel.FK_BookGenre__Book_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_ReadingList__Book_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_Review__Book_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_BookGenre__Genre_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_Complaint__User_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_ReadingList__User_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_Review__User_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_RoleApplication__Role_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_User__Role_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_RoleApplication__User_" ManuallyRouted="false" />
-        <AssociationConnector Association="ShutIKrolModel.FK_UnfreezeRequest__User_" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="ShutIKrolModel.UnfreezeRequest" Width="1.5" PointX="5.25" PointY="16.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShutIKrolModel.Users" Width="1.5" PointX="3" PointY="12" IsExpanded="true" />
+        <AssociationConnector Association="ShutIKrolModel.FK_Book_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_BookGenre_Book" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_ReadingList_Book" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_Review_Book" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_BookGenre_Genre" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_Complaint_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_ReadingList_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_Review_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_RoleApplication_Role" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_Users_Role" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_RoleApplication_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="ShutIKrolModel.FK_UnfreezeRequest_Users" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

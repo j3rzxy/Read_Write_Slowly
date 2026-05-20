@@ -17,6 +17,7 @@ namespace Read_Write_Slowly
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Users()
         {
+            this.Book = new HashSet<Book>();
             this.Complaint = new HashSet<Complaint>();
             this.ReadingList = new HashSet<ReadingList>();
             this.Review = new HashSet<Review>();
@@ -25,14 +26,16 @@ namespace Read_Write_Slowly
         }
     
         public int UserId { get; set; }
-        public string RegistrationDate { get; set; }
         public string Login { get; set; }
         public string PasswordHash { get; set; }
         public string Email { get; set; }
         public string DisplayName { get; set; }
+        public string RegistrationDate { get; set; }
         public int RoleId { get; set; }
         public bool IsFrozen { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Book> Book { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Complaint> Complaint { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

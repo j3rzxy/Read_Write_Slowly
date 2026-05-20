@@ -11,9 +11,9 @@
           </Key>
           <Property Name="BookId" Type="int" Nullable="false" />
           <Property Name="Title" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="Description" Type="nvarchar" MaxLength="255" />
-          <Property Name="CoverPath" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="ContentText" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="CoverPath" Type="nvarchar" MaxLength="500" />
+          <Property Name="ContentText" Type="nvarchar(max)" />
           <Property Name="AuthorUserId" Type="int" Nullable="false" />
           <Property Name="IsFrozen" Type="int" Nullable="false" />
         </EntityType>
@@ -31,19 +31,19 @@
           </Key>
           <Property Name="ComplaintId" Type="int" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="TargetType" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="TargetType" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="TargetId" Type="int" Nullable="false" />
-          <Property Name="Reason" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Reason" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Status" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Genre">
           <Key>
             <PropertyRef Name="GenreId" />
           </Key>
           <Property Name="GenreId" Type="int" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="Description" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="ReadingList">
           <Key>
@@ -52,7 +52,7 @@
           <Property Name="ReadingListId" Type="int" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="BookId" Type="int" Nullable="false" />
-          <Property Name="Status" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="Review">
           <Key>
@@ -64,14 +64,14 @@
           <Property Name="Text" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Rating" Type="float" Nullable="false" />
           <Property Name="IsFrozen" Type="bit" Nullable="false" />
-          <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
             <PropertyRef Name="RoleId" />
           </Key>
           <Property Name="RoleId" Type="int" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="RoleApplication">
           <Key>
@@ -80,8 +80,8 @@
           <Property Name="RoleApplicationId" Type="int" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="RequestedRoleId" Type="int" Nullable="false" />
-          <Property Name="Status" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="CreatedAt" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="CreatedAt" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -99,26 +99,38 @@
           </Key>
           <Property Name="UnfreezeRequestId" Type="int" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="TargetType" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="TargetType" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="TargetId" Type="int" />
-          <Property Name="Reason" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="Status" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Reason" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="50" />
+          <Property Name="CreatedAt" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
             <PropertyRef Name="UserId" />
           </Key>
           <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="RegistrationDate" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="Login" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Login" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="PasswordHash" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="Email" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="DisplayName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="RegistrationDate" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="RoleId" Type="int" Nullable="false" />
           <Property Name="IsFrozen" Type="bit" Nullable="false" />
         </EntityType>
-        <Association Name="FK_BookGenre$_Book$">
+        <Association Name="FK_Book_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Book" Type="Self.Book" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Book">
+              <PropertyRef Name="AuthorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookGenre_Book">
           <End Role="Book" Type="Self.Book" Multiplicity="1" />
           <End Role="BookGenre" Type="Self.BookGenre" Multiplicity="*" />
           <ReferentialConstraint>
@@ -130,7 +142,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_BookGenre$_Genre$">
+        <Association Name="FK_BookGenre_Genre">
           <End Role="Genre" Type="Self.Genre" Multiplicity="1" />
           <End Role="BookGenre" Type="Self.BookGenre" Multiplicity="*" />
           <ReferentialConstraint>
@@ -142,7 +154,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Complaint$_User$">
+        <Association Name="FK_Complaint_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Complaint" Type="Self.Complaint" Multiplicity="*" />
           <ReferentialConstraint>
@@ -154,7 +166,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ReadingList$_Book$">
+        <Association Name="FK_ReadingList_Book">
           <End Role="Book" Type="Self.Book" Multiplicity="1" />
           <End Role="ReadingList" Type="Self.ReadingList" Multiplicity="*" />
           <ReferentialConstraint>
@@ -166,7 +178,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ReadingList$_User$">
+        <Association Name="FK_ReadingList_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="ReadingList" Type="Self.ReadingList" Multiplicity="*" />
           <ReferentialConstraint>
@@ -178,7 +190,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Review$_Book$">
+        <Association Name="FK_Review_Book">
           <End Role="Book" Type="Self.Book" Multiplicity="1" />
           <End Role="Review" Type="Self.Review" Multiplicity="*" />
           <ReferentialConstraint>
@@ -190,7 +202,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Review$_User$">
+        <Association Name="FK_Review_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Review" Type="Self.Review" Multiplicity="*" />
           <ReferentialConstraint>
@@ -202,7 +214,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RoleApplication$_Role$">
+        <Association Name="FK_RoleApplication_Role">
           <End Role="Role" Type="Self.Role" Multiplicity="1" />
           <End Role="RoleApplication" Type="Self.RoleApplication" Multiplicity="*" />
           <ReferentialConstraint>
@@ -214,7 +226,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RoleApplication$_User$">
+        <Association Name="FK_RoleApplication_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="RoleApplication" Type="Self.RoleApplication" Multiplicity="*" />
           <ReferentialConstraint>
@@ -226,7 +238,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_UnfreezeRequest$_User$">
+        <Association Name="FK_UnfreezeRequest_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="UnfreezeRequest" Type="Self.UnfreezeRequest" Multiplicity="*" />
           <ReferentialConstraint>
@@ -238,7 +250,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_User$_Role$">
+        <Association Name="FK_Users_Role">
           <End Role="Role" Type="Self.Role" Multiplicity="1" />
           <End Role="Users" Type="Self.Users" Multiplicity="*" />
           <ReferentialConstraint>
@@ -262,47 +274,51 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UnfreezeRequest" EntityType="Self.UnfreezeRequest" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_BookGenre$_Book$" Association="Self.FK_BookGenre$_Book$">
+          <AssociationSet Name="FK_Book_Users" Association="Self.FK_Book_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Book" EntitySet="Book" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookGenre_Book" Association="Self.FK_BookGenre_Book">
             <End Role="Book" EntitySet="Book" />
             <End Role="BookGenre" EntitySet="BookGenre" />
           </AssociationSet>
-          <AssociationSet Name="FK_BookGenre$_Genre$" Association="Self.FK_BookGenre$_Genre$">
+          <AssociationSet Name="FK_BookGenre_Genre" Association="Self.FK_BookGenre_Genre">
             <End Role="Genre" EntitySet="Genre" />
             <End Role="BookGenre" EntitySet="BookGenre" />
           </AssociationSet>
-          <AssociationSet Name="FK_Complaint$_User$" Association="Self.FK_Complaint$_User$">
+          <AssociationSet Name="FK_Complaint_Users" Association="Self.FK_Complaint_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="Complaint" EntitySet="Complaint" />
           </AssociationSet>
-          <AssociationSet Name="FK_ReadingList$_Book$" Association="Self.FK_ReadingList$_Book$">
+          <AssociationSet Name="FK_ReadingList_Book" Association="Self.FK_ReadingList_Book">
             <End Role="Book" EntitySet="Book" />
             <End Role="ReadingList" EntitySet="ReadingList" />
           </AssociationSet>
-          <AssociationSet Name="FK_ReadingList$_User$" Association="Self.FK_ReadingList$_User$">
+          <AssociationSet Name="FK_ReadingList_Users" Association="Self.FK_ReadingList_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="ReadingList" EntitySet="ReadingList" />
           </AssociationSet>
-          <AssociationSet Name="FK_Review$_Book$" Association="Self.FK_Review$_Book$">
+          <AssociationSet Name="FK_Review_Book" Association="Self.FK_Review_Book">
             <End Role="Book" EntitySet="Book" />
             <End Role="Review" EntitySet="Review" />
           </AssociationSet>
-          <AssociationSet Name="FK_Review$_User$" Association="Self.FK_Review$_User$">
+          <AssociationSet Name="FK_Review_Users" Association="Self.FK_Review_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="Review" EntitySet="Review" />
           </AssociationSet>
-          <AssociationSet Name="FK_RoleApplication$_Role$" Association="Self.FK_RoleApplication$_Role$">
+          <AssociationSet Name="FK_RoleApplication_Role" Association="Self.FK_RoleApplication_Role">
             <End Role="Role" EntitySet="Role" />
             <End Role="RoleApplication" EntitySet="RoleApplication" />
           </AssociationSet>
-          <AssociationSet Name="FK_RoleApplication$_User$" Association="Self.FK_RoleApplication$_User$">
+          <AssociationSet Name="FK_RoleApplication_Users" Association="Self.FK_RoleApplication_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="RoleApplication" EntitySet="RoleApplication" />
           </AssociationSet>
-          <AssociationSet Name="FK_UnfreezeRequest$_User$" Association="Self.FK_UnfreezeRequest$_User$">
+          <AssociationSet Name="FK_UnfreezeRequest_Users" Association="Self.FK_UnfreezeRequest_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="UnfreezeRequest" EntitySet="UnfreezeRequest" />
           </AssociationSet>
-          <AssociationSet Name="FK_User$_Role$" Association="Self.FK_User$_Role$">
+          <AssociationSet Name="FK_Users_Role" Association="Self.FK_Users_Role">
             <End Role="Role" EntitySet="Role" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
@@ -318,14 +334,15 @@
           </Key>
           <Property Name="BookId" Type="Int32" Nullable="false" />
           <Property Name="Title" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="CoverPath" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="ContentText" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CoverPath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="ContentText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="AuthorUserId" Type="Int32" Nullable="false" />
           <Property Name="IsFrozen" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="BookGenre" Relationship="Self.FK_BookGenre__Book_" FromRole="Book" ToRole="BookGenre" />
-          <NavigationProperty Name="ReadingList" Relationship="Self.FK_ReadingList__Book_" FromRole="Book" ToRole="ReadingList" />
-          <NavigationProperty Name="Review" Relationship="Self.FK_Review__Book_" FromRole="Book" ToRole="Review" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Book_Users" FromRole="Book" ToRole="Users" />
+          <NavigationProperty Name="BookGenre" Relationship="Self.FK_BookGenre_Book" FromRole="Book" ToRole="BookGenre" />
+          <NavigationProperty Name="ReadingList" Relationship="Self.FK_ReadingList_Book" FromRole="Book" ToRole="ReadingList" />
+          <NavigationProperty Name="Review" Relationship="Self.FK_Review_Book" FromRole="Book" ToRole="Review" />
         </EntityType>
         <EntityType Name="BookGenre">
           <Key>
@@ -334,8 +351,8 @@
           <Property Name="BookGenreId" Type="Int32" Nullable="false" />
           <Property Name="BookId" Type="Int32" Nullable="false" />
           <Property Name="GenreId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Book" Relationship="Self.FK_BookGenre__Book_" FromRole="BookGenre" ToRole="Book" />
-          <NavigationProperty Name="Genre" Relationship="Self.FK_BookGenre__Genre_" FromRole="BookGenre" ToRole="Genre" />
+          <NavigationProperty Name="Book" Relationship="Self.FK_BookGenre_Book" FromRole="BookGenre" ToRole="Book" />
+          <NavigationProperty Name="Genre" Relationship="Self.FK_BookGenre_Genre" FromRole="BookGenre" ToRole="Genre" />
         </EntityType>
         <EntityType Name="Complaint">
           <Key>
@@ -343,21 +360,21 @@
           </Key>
           <Property Name="ComplaintId" Type="Int32" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="TargetType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TargetType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TargetId" Type="Int32" Nullable="false" />
-          <Property Name="Reason" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="Users" Relationship="Self.FK_Complaint__User_" FromRole="Complaint" ToRole="Users" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Complaint_Users" FromRole="Complaint" ToRole="Users" />
         </EntityType>
         <EntityType Name="Genre">
           <Key>
             <PropertyRef Name="GenreId" />
           </Key>
           <Property Name="GenreId" Type="Int32" Nullable="false" />
-          <Property Name="Name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="BookGenre" Relationship="Self.FK_BookGenre__Genre_" FromRole="Genre" ToRole="BookGenre" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BookGenre" Relationship="Self.FK_BookGenre_Genre" FromRole="Genre" ToRole="BookGenre" />
         </EntityType>
         <EntityType Name="ReadingList">
           <Key>
@@ -366,9 +383,9 @@
           <Property Name="ReadingListId" Type="Int32" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="BookId" Type="Int32" Nullable="false" />
-          <Property Name="Status" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Book" Relationship="Self.FK_ReadingList__Book_" FromRole="ReadingList" ToRole="Book" />
-          <NavigationProperty Name="Users" Relationship="Self.FK_ReadingList__User_" FromRole="ReadingList" ToRole="Users" />
+          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Book" Relationship="Self.FK_ReadingList_Book" FromRole="ReadingList" ToRole="Book" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_ReadingList_Users" FromRole="ReadingList" ToRole="Users" />
         </EntityType>
         <EntityType Name="Review">
           <Key>
@@ -380,18 +397,18 @@
           <Property Name="Text" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Rating" Type="Double" Nullable="false" />
           <Property Name="IsFrozen" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="Book" Relationship="Self.FK_Review__Book_" FromRole="Review" ToRole="Book" />
-          <NavigationProperty Name="Users" Relationship="Self.FK_Review__User_" FromRole="Review" ToRole="Users" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Book" Relationship="Self.FK_Review_Book" FromRole="Review" ToRole="Book" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Review_Users" FromRole="Review" ToRole="Users" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
             <PropertyRef Name="RoleId" />
           </Key>
           <Property Name="RoleId" Type="Int32" Nullable="false" />
-          <Property Name="Name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="RoleApplication" Relationship="Self.FK_RoleApplication__Role_" FromRole="Role" ToRole="RoleApplication" />
-          <NavigationProperty Name="Users" Relationship="Self.FK_User__Role_" FromRole="Role" ToRole="Users" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="RoleApplication" Relationship="Self.FK_RoleApplication_Role" FromRole="Role" ToRole="RoleApplication" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Users_Role" FromRole="Role" ToRole="Users" />
         </EntityType>
         <EntityType Name="RoleApplication">
           <Key>
@@ -400,10 +417,10 @@
           <Property Name="RoleApplicationId" Type="Int32" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="RequestedRoleId" Type="Int32" Nullable="false" />
-          <Property Name="Status" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="CreatedAt" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Role" Relationship="Self.FK_RoleApplication__Role_" FromRole="RoleApplication" ToRole="Role" />
-          <NavigationProperty Name="Users" Relationship="Self.FK_RoleApplication__User_" FromRole="RoleApplication" ToRole="Users" />
+          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CreatedAt" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Role" Relationship="Self.FK_RoleApplication_Role" FromRole="RoleApplication" ToRole="Role" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_RoleApplication_Users" FromRole="RoleApplication" ToRole="Users" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -421,33 +438,46 @@
           </Key>
           <Property Name="UnfreezeRequestId" Type="Int32" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="TargetType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TargetType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TargetId" Type="Int32" />
-          <Property Name="Reason" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
-          <NavigationProperty Name="Users" Relationship="Self.FK_UnfreezeRequest__User_" FromRole="UnfreezeRequest" ToRole="Users" />
+          <Property Name="Reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_UnfreezeRequest_Users" FromRole="UnfreezeRequest" ToRole="Users" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
             <PropertyRef Name="UserId" />
           </Key>
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="RegistrationDate" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Login" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Login" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="PasswordHash" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="DisplayName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DisplayName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="RegistrationDate" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="RoleId" Type="Int32" Nullable="false" />
           <Property Name="IsFrozen" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Complaint" Relationship="Self.FK_Complaint__User_" FromRole="Users" ToRole="Complaint" />
-          <NavigationProperty Name="ReadingList" Relationship="Self.FK_ReadingList__User_" FromRole="Users" ToRole="ReadingList" />
-          <NavigationProperty Name="Review" Relationship="Self.FK_Review__User_" FromRole="Users" ToRole="Review" />
-          <NavigationProperty Name="Role" Relationship="Self.FK_User__Role_" FromRole="Users" ToRole="Role" />
-          <NavigationProperty Name="RoleApplication" Relationship="Self.FK_RoleApplication__User_" FromRole="Users" ToRole="RoleApplication" />
-          <NavigationProperty Name="UnfreezeRequest" Relationship="Self.FK_UnfreezeRequest__User_" FromRole="Users" ToRole="UnfreezeRequest" />
+          <NavigationProperty Name="Book" Relationship="Self.FK_Book_Users" FromRole="Users" ToRole="Book" />
+          <NavigationProperty Name="Complaint" Relationship="Self.FK_Complaint_Users" FromRole="Users" ToRole="Complaint" />
+          <NavigationProperty Name="ReadingList" Relationship="Self.FK_ReadingList_Users" FromRole="Users" ToRole="ReadingList" />
+          <NavigationProperty Name="Review" Relationship="Self.FK_Review_Users" FromRole="Users" ToRole="Review" />
+          <NavigationProperty Name="Role" Relationship="Self.FK_Users_Role" FromRole="Users" ToRole="Role" />
+          <NavigationProperty Name="RoleApplication" Relationship="Self.FK_RoleApplication_Users" FromRole="Users" ToRole="RoleApplication" />
+          <NavigationProperty Name="UnfreezeRequest" Relationship="Self.FK_UnfreezeRequest_Users" FromRole="Users" ToRole="UnfreezeRequest" />
         </EntityType>
-        <Association Name="FK_BookGenre__Book_">
+        <Association Name="FK_Book_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Book" Type="Self.Book" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Book">
+              <PropertyRef Name="AuthorUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BookGenre_Book">
           <End Role="Book" Type="Self.Book" Multiplicity="1" />
           <End Role="BookGenre" Type="Self.BookGenre" Multiplicity="*" />
           <ReferentialConstraint>
@@ -459,7 +489,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ReadingList__Book_">
+        <Association Name="FK_ReadingList_Book">
           <End Role="Book" Type="Self.Book" Multiplicity="1" />
           <End Role="ReadingList" Type="Self.ReadingList" Multiplicity="*" />
           <ReferentialConstraint>
@@ -471,7 +501,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Review__Book_">
+        <Association Name="FK_Review_Book">
           <End Role="Book" Type="Self.Book" Multiplicity="1" />
           <End Role="Review" Type="Self.Review" Multiplicity="*" />
           <ReferentialConstraint>
@@ -483,7 +513,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_BookGenre__Genre_">
+        <Association Name="FK_BookGenre_Genre">
           <End Role="Genre" Type="Self.Genre" Multiplicity="1" />
           <End Role="BookGenre" Type="Self.BookGenre" Multiplicity="*" />
           <ReferentialConstraint>
@@ -495,7 +525,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Complaint__User_">
+        <Association Name="FK_Complaint_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Complaint" Type="Self.Complaint" Multiplicity="*" />
           <ReferentialConstraint>
@@ -507,7 +537,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ReadingList__User_">
+        <Association Name="FK_ReadingList_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="ReadingList" Type="Self.ReadingList" Multiplicity="*" />
           <ReferentialConstraint>
@@ -519,7 +549,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Review__User_">
+        <Association Name="FK_Review_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Review" Type="Self.Review" Multiplicity="*" />
           <ReferentialConstraint>
@@ -531,7 +561,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RoleApplication__Role_">
+        <Association Name="FK_RoleApplication_Role">
           <End Role="Role" Type="Self.Role" Multiplicity="1" />
           <End Role="RoleApplication" Type="Self.RoleApplication" Multiplicity="*" />
           <ReferentialConstraint>
@@ -543,7 +573,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_User__Role_">
+        <Association Name="FK_Users_Role">
           <End Role="Role" Type="Self.Role" Multiplicity="1" />
           <End Role="Users" Type="Self.Users" Multiplicity="*" />
           <ReferentialConstraint>
@@ -555,7 +585,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RoleApplication__User_">
+        <Association Name="FK_RoleApplication_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="RoleApplication" Type="Self.RoleApplication" Multiplicity="*" />
           <ReferentialConstraint>
@@ -567,7 +597,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_UnfreezeRequest__User_">
+        <Association Name="FK_UnfreezeRequest_Users">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="UnfreezeRequest" Type="Self.UnfreezeRequest" Multiplicity="*" />
           <ReferentialConstraint>
@@ -579,7 +609,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="ShutIKrolEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="ShutIKrolEntities1" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Book" EntityType="Self.Book" />
           <EntitySet Name="BookGenre" EntityType="Self.BookGenre" />
           <EntitySet Name="Complaint" EntityType="Self.Complaint" />
@@ -591,47 +621,51 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="UnfreezeRequest" EntityType="Self.UnfreezeRequest" />
           <EntitySet Name="Users" EntityType="Self.Users" />
-          <AssociationSet Name="FK_BookGenre__Book_" Association="Self.FK_BookGenre__Book_">
+          <AssociationSet Name="FK_Book_Users" Association="Self.FK_Book_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Book" EntitySet="Book" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BookGenre_Book" Association="Self.FK_BookGenre_Book">
             <End Role="Book" EntitySet="Book" />
             <End Role="BookGenre" EntitySet="BookGenre" />
           </AssociationSet>
-          <AssociationSet Name="FK_ReadingList__Book_" Association="Self.FK_ReadingList__Book_">
+          <AssociationSet Name="FK_ReadingList_Book" Association="Self.FK_ReadingList_Book">
             <End Role="Book" EntitySet="Book" />
             <End Role="ReadingList" EntitySet="ReadingList" />
           </AssociationSet>
-          <AssociationSet Name="FK_Review__Book_" Association="Self.FK_Review__Book_">
+          <AssociationSet Name="FK_Review_Book" Association="Self.FK_Review_Book">
             <End Role="Book" EntitySet="Book" />
             <End Role="Review" EntitySet="Review" />
           </AssociationSet>
-          <AssociationSet Name="FK_BookGenre__Genre_" Association="Self.FK_BookGenre__Genre_">
+          <AssociationSet Name="FK_BookGenre_Genre" Association="Self.FK_BookGenre_Genre">
             <End Role="Genre" EntitySet="Genre" />
             <End Role="BookGenre" EntitySet="BookGenre" />
           </AssociationSet>
-          <AssociationSet Name="FK_Complaint__User_" Association="Self.FK_Complaint__User_">
+          <AssociationSet Name="FK_Complaint_Users" Association="Self.FK_Complaint_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="Complaint" EntitySet="Complaint" />
           </AssociationSet>
-          <AssociationSet Name="FK_ReadingList__User_" Association="Self.FK_ReadingList__User_">
+          <AssociationSet Name="FK_ReadingList_Users" Association="Self.FK_ReadingList_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="ReadingList" EntitySet="ReadingList" />
           </AssociationSet>
-          <AssociationSet Name="FK_Review__User_" Association="Self.FK_Review__User_">
+          <AssociationSet Name="FK_Review_Users" Association="Self.FK_Review_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="Review" EntitySet="Review" />
           </AssociationSet>
-          <AssociationSet Name="FK_RoleApplication__Role_" Association="Self.FK_RoleApplication__Role_">
+          <AssociationSet Name="FK_RoleApplication_Role" Association="Self.FK_RoleApplication_Role">
             <End Role="Role" EntitySet="Role" />
             <End Role="RoleApplication" EntitySet="RoleApplication" />
           </AssociationSet>
-          <AssociationSet Name="FK_User__Role_" Association="Self.FK_User__Role_">
+          <AssociationSet Name="FK_Users_Role" Association="Self.FK_Users_Role">
             <End Role="Role" EntitySet="Role" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
-          <AssociationSet Name="FK_RoleApplication__User_" Association="Self.FK_RoleApplication__User_">
+          <AssociationSet Name="FK_RoleApplication_Users" Association="Self.FK_RoleApplication_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="RoleApplication" EntitySet="RoleApplication" />
           </AssociationSet>
-          <AssociationSet Name="FK_UnfreezeRequest__User_" Association="Self.FK_UnfreezeRequest__User_">
+          <AssociationSet Name="FK_UnfreezeRequest_Users" Association="Self.FK_UnfreezeRequest_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="UnfreezeRequest" EntitySet="UnfreezeRequest" />
           </AssociationSet>
@@ -641,7 +675,7 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="Хранилище ShutIKrolModelContainer" CdmEntityContainer="ShutIKrolEntities">
+        <EntityContainerMapping StorageEntityContainer="Хранилище ShutIKrolModelContainer" CdmEntityContainer="ShutIKrolEntities1">
           <EntitySetMapping Name="Book">
             <EntityTypeMapping TypeName="ShutIKrolModel.Book">
               <MappingFragment StoreEntitySet="Book">
@@ -756,11 +790,11 @@
             <EntityTypeMapping TypeName="ShutIKrolModel.Users">
               <MappingFragment StoreEntitySet="Users">
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="RegistrationDate" ColumnName="RegistrationDate" />
                 <ScalarProperty Name="Login" ColumnName="Login" />
                 <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
+                <ScalarProperty Name="RegistrationDate" ColumnName="RegistrationDate" />
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="IsFrozen" ColumnName="IsFrozen" />
               </MappingFragment>

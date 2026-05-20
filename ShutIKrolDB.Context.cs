@@ -13,10 +13,10 @@ namespace Read_Write_Slowly
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class ShutIKrolEntities : DbContext
+    public partial class ShutIKrolEntities1 : DbContext
     {
-        public ShutIKrolEntities()
-            : base("name=ShutIKrolEntities")
+        public ShutIKrolEntities1()
+            : base("name=ShutIKrolEntities1")
         {
         }
     
