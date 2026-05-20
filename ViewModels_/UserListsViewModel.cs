@@ -1,4 +1,6 @@
-﻿using Read_Write_Slowly.Repositories_;
+﻿using Read_Write_Slowly.Models_;
+using Read_Write_Slowly.Repositories_;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -8,10 +10,11 @@ namespace Read_Write_Slowly.ViewModels_
     public class UserListsViewModel : BaseViewModel
     {
         private readonly ReadingListRepository _listRepository;
-        private readonly BookRepository _bookRepository; // Используем методы жанров из прошлого репозитория
-        private readonly int _currentUserId = 1; // Заглушка (в реальности берется из сессии)
+        private readonly BookRepository _bookRepository;
+        private readonly int _currentUserId;
+        private readonly Action<object> _navigateTo;
 
-        // Текущий выбранный список (вкладка)
+        // Текущая вкладка
         private string _selectedTabStatus = "В планах";
         public string SelectedTabStatus
         {
@@ -19,7 +22,7 @@ namespace Read_Write_Slowly.ViewModels_
             set { _selectedTabStatus = value; OnPropertyChanged(); LoadCurrentList(); }
         }
 
-        // Поиск и фильтрация
+        // Фильтрация
         private string _searchText;
         public string SearchText
         {
@@ -49,57 +52,66 @@ namespace Read_Write_Slowly.ViewModels_
         public ICommand MoveBookCommand { get; }
         public ICommand OpenBookCommand { get; }
 
-        public UserListsViewModel()
+        // Принимает реальный userId и делегат навигации
+        public UserListsViewModel(int userId, Action<object> navigateTo)
         {
+            _currentUserId = userId;
+            _navigateTo = navigateTo;
             _listRepository = new ReadingListRepository();
             _bookRepository = new BookRepository();
             DisplayedBooks = new ObservableCollection<Book>();
 
-            // Загрузка жанров для комбобокса
             Genres = _bookRepository.GetGenres();
             Genres.Insert(0, new Genre { GenreId = 0, Name = "Все жанры" });
 
-            // Инициализация команд
             MoveBookCommand = new RelayCommand<object>(MoveBook);
             OpenBookCommand = new RelayCommand<Book>(OpenBookDetails);
 
             LoadCurrentList();
         }
 
-        // Загрузка книг для текущего выбранного статуса
         private void LoadCurrentList()
         {
-            int? genreId = (SelectedGenre == null || SelectedGenre.GenreId == 0) ? null : (int?)SelectedGenre.GenreId;
+            int? genreId = (SelectedGenre == null || SelectedGenre.GenreId == 0)
+                           ? (int?)null
+                           : SelectedGenre.GenreId;
 
-            var books = _listRepository.GetUserReadingList(_currentUserId, SelectedTabStatus, SearchText, genreId, SelectedSort);
+            var books = _listRepository.GetUserReadingList(
+                _currentUserId, SelectedTabStatus, SearchText, genreId, SelectedSort);
 
             DisplayedBooks.Clear();
             foreach (var book in books)
-            {
                 DisplayedBooks.Add(book);
-            }
         }
 
-        // Перемещение книги в другой список
         private void MoveBook(object parameter)
         {
             var values = parameter as object[];
-            if (values != null && values.Length == 2)
-            {
-                var book = values[0] as Book;
-                string newStatus = values[1].ToString();
+            if (values == null || values.Length != 2) return;
 
-                _listRepository.MoveBookToAnotherList(_currentUserId, book.BookId, newStatus);
+            var book = values[0] as Book;
+            string status = values[1]?.ToString();
+            if (book == null || status == null) return;
 
-                // После перемещения удаляем книгу из текущего отображения на UI
-                DisplayedBooks.Remove(book);
-            }
+            _listRepository.MoveBookToAnotherList(_currentUserId, book.BookId, status);
+            DisplayedBooks.Remove(book);
         }
 
         private void OpenBookDetails(Book book)
         {
-            if (book == null) return;
-            // Переход на страницу деталей книги (BookPage)
+            if (book == null || _navigateTo == null) return;
+
+            // Получаем текущего пользователя из репозитория — или передаём дальше из конструктора
+            // Здесь используем заглушку-сервис; в реальности лучше передавать User через конструктор
+            var userRepo = new UserRepository();
+            var user = userRepo.GetUserById(_currentUserId);
+
+            var bookVm = new BookDetailsViewModel(
+                book.BookId,
+                user,
+                () => _navigateTo(new UserListsViewModel(_currentUserId, _navigateTo)));
+
+            _navigateTo(bookVm);
         }
     }
 }

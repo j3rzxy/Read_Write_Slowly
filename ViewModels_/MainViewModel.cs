@@ -1,9 +1,4 @@
 ﻿using Read_Write_Slowly.Models_;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,10 +6,10 @@ namespace Read_Write_Slowly.ViewModels_
 {
     public class MainViewModel : BaseViewModel
     {
-        // Текущий пользователь (храним сессию)
+        // Текущий авторизованный пользователь (сессия)
         public User CurrentUser { get; set; }
 
-        // Свойство, к которому привязан ContentControl (динамическая смена страниц)
+        // Текущая страница в ContentControl
         private object _currentViewModel;
         public object CurrentViewModel
         {
@@ -22,13 +17,14 @@ namespace Read_Write_Slowly.ViewModels_
             set { _currentViewModel = value; OnPropertyChanged(); }
         }
 
-        // Видимость разделов меню на основе Ролей
-        // (Допустим: RoleId 1 = Читатель, 2 = Автор, 3 = Администратор)
+        // Видимость пунктов меню по роли
         public bool IsAuthorMenuVisible => CurrentUser != null && (CurrentUser.RoleId == 2 || CurrentUser.RoleId == 3);
         public bool IsAdminMenuVisible => CurrentUser != null && CurrentUser.RoleId == 3;
 
         // Команды навигации
         public ICommand OpenCatalogCommand { get; }
+        public ICommand OpenProfileCommand { get; }
+        public ICommand OpenMyListsCommand { get; }
         public ICommand OpenAuthorPanelCommand { get; }
         public ICommand OpenAdminPanelCommand { get; }
         public ICommand LogoutCommand { get; }
@@ -37,32 +33,34 @@ namespace Read_Write_Slowly.ViewModels_
         {
             CurrentUser = user;
 
-            // По умолчанию при входе открываем, например, Панель Автора или Каталог.
-            // Если админ — откроем админку, если автор — панель автора, иначе — пустую/каталог.
-            if (IsAdminMenuVisible)
-                CurrentViewModel = new AdminViewModel();
-            else if (IsAuthorMenuVisible)
-                CurrentViewModel = new AuthorViewModel();
-            else
-                CurrentViewModel = null; // Здесь в будущем будет Каталог Книг (new CatalogViewModel())
+            // Стартовая страница — всегда Каталог
+            CurrentViewModel = CreateCatalogViewModel();
 
-            // Инициализация команд переключения страниц
-            OpenAuthorPanelCommand = new RelayCommand(() => CurrentViewModel = new AuthorViewModel());
+            // Инициализация команд
+            OpenCatalogCommand = new RelayCommand(() => CurrentViewModel = CreateCatalogViewModel());
+            OpenProfileCommand = new RelayCommand(() => CurrentViewModel = new ProfileViewModel(CurrentUser.UserId));
+            OpenMyListsCommand = new RelayCommand(() => CurrentViewModel = new UserListsViewModel(CurrentUser.UserId, NavigateTo));
+            OpenAuthorPanelCommand = new RelayCommand(() => CurrentViewModel = new AuthorViewModel(CurrentUser.UserId));
             OpenAdminPanelCommand = new RelayCommand(() => CurrentViewModel = new AdminViewModel());
 
-            // Заглушка для каталога
-            OpenCatalogCommand = new RelayCommand(() => MessageBox.Show("Экран каталога книг в разработке!", "Инфо"));
-
-            // Команда выхода из аккаунта
             LogoutCommand = new RelayCommand<Window>((window) =>
             {
-                // Открываем заново окно авторизации
-                View_.AuthWindow authWindow = new View_.AuthWindow();
+                var authWindow = new View_.AuthWindow();
                 authWindow.Show();
-
-                // Закрываем главное окно
                 window?.Close();
             });
+        }
+
+        // Централизованный метод навигации, передаётся дочерним ViewModel как делегат
+        public void NavigateTo(object viewModel)
+        {
+            CurrentViewModel = viewModel;
+        }
+
+        // Фабричный метод — создаёт CatalogViewModel с правильным контекстом
+        private CatalogViewModel CreateCatalogViewModel()
+        {
+            return new CatalogViewModel(CurrentUser, NavigateTo);
         }
     }
 }

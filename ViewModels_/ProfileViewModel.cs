@@ -9,16 +9,16 @@ namespace Read_Write_Slowly.ViewModels_
     public class ProfileViewModel : BaseViewModel
     {
         private readonly ProfileRepository _repository;
-        private readonly int _currentUserId = 3; // Заглушка (в реальности берется ID залогиненного юзера, например Мария Читателева из скрипта)
+        private readonly int _currentUserId;
 
         public User CurrentUser { get; set; }
         public ObservableCollection<Review> UserReviews { get; set; }
 
-        // Видимость элементов управления
-        public Visibility AuthorButtonVisibility => (CurrentUser != null && CurrentUser.RoleId == 1) ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility FrozenWarningVisibility => (CurrentUser != null && CurrentUser.IsFrozen) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility AuthorButtonVisibility => (CurrentUser != null && CurrentUser.RoleId == 1)
+                                                     ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility FrozenWarningVisibility => (CurrentUser != null && CurrentUser.IsFrozen)
+                                                     ? Visibility.Visible : Visibility.Collapsed;
 
-        // Поле для текста апелляции
         private string _unfreezeReason;
         public string UnfreezeReason
         {
@@ -26,12 +26,13 @@ namespace Read_Write_Slowly.ViewModels_
             set { _unfreezeReason = value; OnPropertyChanged(); }
         }
 
-        // Команды
         public ICommand ApplyForAuthorCommand { get; }
         public ICommand SubmitUnfreezeCommand { get; }
 
-        public ProfileViewModel()
+        // Принимает реальный ID авторизованного пользователя
+        public ProfileViewModel(int userId)
         {
+            _currentUserId = userId;
             _repository = new ProfileRepository();
 
             ApplyForAuthorCommand = new RelayCommand(ApplyForAuthor);
@@ -44,10 +45,8 @@ namespace Read_Write_Slowly.ViewModels_
         {
             CurrentUser = _repository.GetUserProfile(_currentUserId);
             var reviews = _repository.GetUserReviews(_currentUserId);
-
             UserReviews = new ObservableCollection<Review>(reviews);
 
-            // Уведомляем UI о том, что данные загрузились
             OnPropertyChanged(nameof(CurrentUser));
             OnPropertyChanged(nameof(UserReviews));
             OnPropertyChanged(nameof(AuthorButtonVisibility));
@@ -56,15 +55,11 @@ namespace Read_Write_Slowly.ViewModels_
 
         private void ApplyForAuthor()
         {
-            bool isSubmitted = _repository.CheckAndApplyForAuthor(_currentUserId);
-            if (isSubmitted)
-            {
-                MessageBox.Show("Ваша заявка на роль Автора успешно отправлена администрации и находится на рассмотрении.", "Успех");
-            }
+            bool submitted = _repository.CheckAndApplyForAuthor(_currentUserId);
+            if (submitted)
+                MessageBox.Show("Заявка на роль Автора отправлена на рассмотрение.", "Успех");
             else
-            {
-                MessageBox.Show("Вы уже отправляли заявку ранее. Пожалуйста, дождитесь решения модератора.", "Инфо");
-            }
+                MessageBox.Show("Вы уже отправляли заявку. Дождитесь решения модератора.", "Инфо");
         }
 
         private void SubmitUnfreeze()
@@ -74,7 +69,6 @@ namespace Read_Write_Slowly.ViewModels_
                 MessageBox.Show("Пожалуйста, опишите причину для разморозки аккаунта.");
                 return;
             }
-
             _repository.SendUnfreezeRequest(_currentUserId, UnfreezeReason);
             MessageBox.Show("Апелляция успешно отправлена администраторам.", "Отправлено");
             UnfreezeReason = "";

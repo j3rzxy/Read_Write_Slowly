@@ -1,59 +1,61 @@
-﻿using System.Collections.ObjectModel;
+﻿using Read_Write_Slowly.Models_;
+using Read_Write_Slowly.Repositories_;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
-using Read_Write_Slowly.Models_;
-using Read_Write_Slowly.Repositories_;
 
 namespace Read_Write_Slowly.ViewModels_
 {
     public class AuthorViewModel : BaseViewModel
     {
         private readonly AuthorRepository _repository;
-        private readonly int _authorUserId = 2; // Заглушка текущего автора (например, из сессии)
+        private readonly int _authorUserId;
 
         public ObservableCollection<Book> MyBooks { get; set; }
 
-        // Выбранная книга для редактирования или апелляции
         private Book _selectedBook;
         public Book SelectedBook
         {
             get => _selectedBook;
-            set
-            {
-                _selectedBook = value;
-                OnPropertyChanged();
-                LoadSelectedBookToForm();
-            }
+            set { _selectedBook = value; OnPropertyChanged(); LoadSelectedBookToForm(); }
         }
 
-        // Поля формы ввода
+        // Поля формы
         private string _formTitle;
-        public string FormTitle { get => _formTitle; set { _formTitle = value; OnPropertyChanged(); } }
+        public string FormTitle
+        { get => _formTitle; set { _formTitle = value; OnPropertyChanged(); } }
 
         private string _formDescription;
-        public string FormDescription { get => _formDescription; set { _formDescription = value; OnPropertyChanged(); } }
+        public string FormDescription
+        { get => _formDescription; set { _formDescription = value; OnPropertyChanged(); } }
 
         private string _formCoverPath;
-        public string FormCoverPath { get => _formCoverPath; set { _formCoverPath = value; OnPropertyChanged(); } }
+        public string FormCoverPath
+        { get => _formCoverPath; set { _formCoverPath = value; OnPropertyChanged(); } }
 
         private string _formContentText;
-        public string FormContentText { get => _formContentText; set { _formContentText = value; OnPropertyChanged(); } }
+        public string FormContentText
+        { get => _formContentText; set { _formContentText = value; OnPropertyChanged(); } }
 
         private string _unfreezeReason;
-        public string UnfreezeReason { get => _unfreezeReason; set { _unfreezeReason = value; OnPropertyChanged(); } }
+        public string UnfreezeReason
+        { get => _unfreezeReason; set { _unfreezeReason = value; OnPropertyChanged(); } }
 
         // Состояния UI
         public bool IsEditMode => SelectedBook != null;
         public string FormHeader => IsEditMode ? "Редактирование книги" : "Добавление новой книги";
-        public Visibility UnfreezePanelVisibility => (SelectedBook != null && SelectedBook.IsFrozen == 1) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility UnfreezePanelVisibility =>
+            (SelectedBook != null && SelectedBook.IsFrozen == 1) ? Visibility.Visible : Visibility.Collapsed;
 
         // Команды
         public ICommand SaveBookCommand { get; }
         public ICommand ClearFormCommand { get; }
         public ICommand SubmitUnfreezeCommand { get; }
 
-        public AuthorViewModel()
+        // Принимает реальный userId автора из сессии
+        public AuthorViewModel(int authorUserId)
         {
+            _authorUserId = authorUserId;
             _repository = new AuthorRepository();
             MyBooks = new ObservableCollection<Book>();
 
@@ -71,7 +73,6 @@ namespace Read_Write_Slowly.ViewModels_
             foreach (var b in books) MyBooks.Add(b);
         }
 
-        // Заполнение полей формы при клике на книгу в списке
         private void LoadSelectedBookToForm()
         {
             if (SelectedBook != null)
@@ -90,7 +91,6 @@ namespace Read_Write_Slowly.ViewModels_
             OnPropertyChanged(nameof(UnfreezePanelVisibility));
         }
 
-        // Сохранение (Создание или Обновление)
         private void SaveBook()
         {
             if (string.IsNullOrWhiteSpace(FormTitle))
@@ -101,7 +101,6 @@ namespace Read_Write_Slowly.ViewModels_
 
             if (IsEditMode)
             {
-                // Режим обновления
                 SelectedBook.Title = FormTitle;
                 SelectedBook.Description = FormDescription;
                 SelectedBook.CoverPath = FormCoverPath;
@@ -112,8 +111,7 @@ namespace Read_Write_Slowly.ViewModels_
             }
             else
             {
-                // Режим создания новой книги
-                Book newBook = new Book
+                var newBook = new Book
                 {
                     Title = FormTitle,
                     Description = FormDescription,
@@ -121,7 +119,6 @@ namespace Read_Write_Slowly.ViewModels_
                     ContentText = FormContentText,
                     AuthorUserId = _authorUserId
                 };
-
                 _repository.AddBook(newBook);
                 MessageBox.Show("Новая книга успешно опубликована!", "Успех");
             }
@@ -134,12 +131,11 @@ namespace Read_Write_Slowly.ViewModels_
         {
             if (SelectedBook == null || string.IsNullOrWhiteSpace(UnfreezeReason))
             {
-                MessageBox.Show("Опишите аргументированную причину разморозки.");
+                MessageBox.Show("Выберите книгу и опишите причину разморозки.");
                 return;
             }
-
             _repository.SendBookUnfreezeRequest(_authorUserId, SelectedBook.BookId, UnfreezeReason);
-            MessageBox.Show("Запрос на разморозку книги отправлен на рассмотрение администраторам.", "Отправлено");
+            MessageBox.Show("Запрос на разморозку отправлен администраторам.", "Отправлено");
             UnfreezeReason = "";
         }
 

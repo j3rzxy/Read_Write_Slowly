@@ -10,43 +10,77 @@ namespace Read_Write_Slowly.Repositories_
 
         public UserRepository()
         {
-            // Получаем строку подключения из App.config
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            _connectionString = ConfigurationManager
+                .ConnectionStrings["DefaultConnection"].ConnectionString;
         }
 
         public User AuthenticateUser(string login, string passwordHash)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+                string query = @"
+                    SELECT u.UserId, u.Login, u.DisplayName, u.RoleId, u.IsFrozen,
+                           u.Email, u.RegistrationDate, r.Name AS RoleName
+                    FROM   Users u
+                    JOIN   Roles r ON r.RoleId = u.RoleId
+                    WHERE  u.Login = @login AND u.PasswordHash = @passwordHash";
 
-                // Запрос проверяет логин и хеш пароля, и если они верны — возвращает данные пользователя
-                string query = @"SELECT UserId, Login, DisplayName, RoleId, IsFrozen 
-                                 FROM Users 
-                                 WHERE Login = @login AND PasswordHash = @passwordHash";
-
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (var cmd = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@login", login);
-                    command.Parameters.AddWithValue("@passwordHash", passwordHash);
+                    cmd.Parameters.AddWithValue("@login", login);
+                    cmd.Parameters.AddWithValue("@passwordHash", passwordHash);
 
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read()) // Если запись найдена
-                        {
-                            return new User
-                            {
-                                UserId = reader.GetInt32(0),
-                                Login = reader.GetString(1),
-                                DisplayName = reader.GetString(2),
-                                RoleId = reader.GetInt32(3),
-                                IsFrozen = reader.GetBoolean(4)
-                            };
-                        }
+                        if (reader.Read())
+                            return MapUser(reader);
                     }
                 }
             }
-            return null; // Если логин или пароль неверные
+            return null;
+        }
+
+        // Получение пользователя по его Id (используется в UserListsViewModel)
+        public User GetUserById(int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                string query = @"
+                    SELECT u.UserId, u.Login, u.DisplayName, u.RoleId, u.IsFrozen,
+                           u.Email, u.RegistrationDate, r.Name AS RoleName
+                    FROM   Users u
+                    JOIN   Roles r ON r.RoleId = u.RoleId
+                    WHERE  u.UserId = @userId";
+
+                using (var cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            return MapUser(reader);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private static User MapUser(SqlDataReader reader)
+        {
+            return new User
+            {
+                UserId = reader.GetInt32(0),
+                Login = reader.GetString(1),
+                DisplayName = reader.GetString(2),
+                RoleId = reader.GetInt32(3),
+                IsFrozen = reader.GetBoolean(4),
+                Email = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                RegistrationDate = reader.IsDBNull(6) ? "" : reader.GetDateTime(6).ToString("dd.MM.yyyy"),
+                RoleName = reader.IsDBNull(7) ? "" : reader.GetString(7),
+            };
         }
     }
 }

@@ -1,26 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
 
 namespace Read_Write_Slowly.View_
 {
     /// <summary>
-    /// Логика взаимодействия для BookPge.xaml
+    /// Логика взаимодействия для BookPage.xaml
     /// </summary>
-    public partial class BookPge : UserControl
+    public partial class BookPage : UserControl
     {
-        public BookPge()
+        public BookPage()
         {
             InitializeComponent();
         }
