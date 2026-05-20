@@ -1,4 +1,6 @@
 ﻿using Read_Write_Slowly.Models_;
+using Book = Read_Write_Slowly.Models_.Book;
+using Review = Read_Write_Slowly.Models_.Review;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

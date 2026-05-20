@@ -92,9 +92,11 @@
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models_\Book.cs" />
+    <Compile Include="Models_\Book.Partial.cs" />
     <Compile Include="Models_\ComplaintInfo.cs" />
     <Compile Include="Models_\Genre.cs" />
     <Compile Include="Models_\Review.cs" />
+    <Compile Include="Models_\Review.Partial.cs" />
     <Compile Include="Models_\RoleApplicationInfo.cs" />
     <Compile Include="Models_\UnfreezeRequestInfo.cs" />
     <Compile Include="Models_\User.cs" />
@@ -232,7 +234,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -244,33 +245,27 @@
     <None Include="ShutIKrolDB.edmx.diagram">
       <DependentUpon>ShutIKrolDB.edmx</DependentUpon>
     </None>
-    <Resource Include="Resources\Noto\NotoSans-Bold.ttf" />
-    <Resource Include="Resources\Noto\NotoSans-BoldItalic.ttf" />
-    <Resource Include="Resources\Noto\NotoSans-Italic.ttf" />
-    <Resource Include="Resources\Noto\NotoSans-Regular.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-Black.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-BlackItalic.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-Bold.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-BoldItalic.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-Italic.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-Light.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-LightItalic.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-Medium.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-MediumItalic.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-Regular.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-Thin.ttf" />
-    <Resource Include="Resources\Roboto\Roboto-ThinItalic.ttf" />
-    <Resource Include="Resources\Roboto\RobotoCondensed-Bold.ttf" />
-    <Resource Include="Resources\Roboto\RobotoCondensed-BoldItalic.ttf" />
-    <Resource Include="Resources\Roboto\RobotoCondensed-Italic.ttf" />
-    <Resource Include="Resources\Roboto\RobotoCondensed-Light.ttf" />
-    <Resource Include="Resources\Roboto\RobotoCondensed-LightItalic.ttf" />
-    <Resource Include="Resources\Roboto\RobotoCondensed-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="EntityFramework.ru">
+      <Version>6.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="MaterialDesignColors">
+      <Version>5.3.2</Version>
+    </PackageReference>
+    <PackageReference Include="MaterialDesignThemes">
+      <Version>5.3.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
+      <Version>1.1.77</Version>
+    </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager">
+      <Version>10.0.8</Version>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="ShutIKrolDB.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -287,11 +282,4 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="packages\MaterialDesignThemes.5.3.2\build\MaterialDesignThemes.targets" Condition="Exists('packages\MaterialDesignThemes.5.3.2\build\MaterialDesignThemes.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('packages\MaterialDesignThemes.5.3.2\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\MaterialDesignThemes.5.3.2\build\MaterialDesignThemes.targets'))" />
-  </Target>
 </Project>

@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 
-// ИСПРАВЛЕНО: псевдонимы явно указывают компилятору использовать DTO из Models_,
-// а не EF-сущности с теми же именами из корневого пространства имён.
-using Book = Read_Write_Slowly.Models_.Book;
-using Review = Read_Write_Slowly.Models_.Review;
-
 namespace Read_Write_Slowly.Repositories_
 {
     public class BookDetailsRepository
@@ -50,8 +45,7 @@ namespace Read_Write_Slowly.Repositories_
                                 Description = reader.IsDBNull(2) ? "" : reader.GetString(2),
                                 CoverPath = reader.IsDBNull(3) ? "pack://application:,,,/Resources/no_cover.png" : reader.GetString(3),
                                 AuthorName = reader.GetString(4),
-                                // ИСПРАВЛЕНО: Genres теперь считывается (индекс 5)
-                                Genres = reader.IsDBNull(5) ? "" : reader.GetString(5)
+                                Genres = reader.IsDBNull(5) ? new List<string>(): new List<string>(reader.GetString(5).Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries))
                             };
                         }
                     }

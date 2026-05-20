@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-
-// ИСПРАВЛЕНО: псевдонимы направляют компилятор к DTO из Models_,
-// а не к EF-сущностям с теми же именами из корневого пространства имён.
 using Book = Read_Write_Slowly.Models_.Book;
+using Review = Read_Write_Slowly.Models_.Review;
 using Genre = Read_Write_Slowly.Models_.Genre;
 
 namespace Read_Write_Slowly.Repositories_

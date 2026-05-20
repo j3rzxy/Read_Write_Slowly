@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using Read_Write_Slowly.Models_;
 
 namespace Read_Write_Slowly.Repositories_
 {

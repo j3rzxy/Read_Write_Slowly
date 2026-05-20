@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using Read_Write_Slowly.Models_;
+using Book = Read_Write_Slowly.Models_.Book;
+using Genre = Read_Write_Slowly.Models_.Genre;
 
 namespace Read_Write_Slowly.Repositories_
 {
