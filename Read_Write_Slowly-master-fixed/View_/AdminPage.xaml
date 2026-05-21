@@ -96,6 +96,27 @@
                             <DataGridTextColumn Header="От кого" Binding="{Binding ReporterName}" Width="150"/>
                             <DataGridTextColumn Header="Тип объекта" Binding="{Binding TargetType}" Width="100"/>
 
+                            <DataGridTemplateColumn Header="Автор отзыва" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding TargetType}" Value="review">
+                                                            <Setter Property="Text" Value="{Binding ReviewAuthorName}"/>
+                                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                    <Setter Property="Text" Value="—"/>
+                                                    <Setter Property="Foreground" Value="Gray"/>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
                             <DataGridTemplateColumn Header="Содержание объекта" Width="200">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

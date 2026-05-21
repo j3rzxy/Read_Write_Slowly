@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Read_Write_Slowly.Models_
+﻿namespace Read_Write_Slowly.Models_
 {
     public class Book
     {

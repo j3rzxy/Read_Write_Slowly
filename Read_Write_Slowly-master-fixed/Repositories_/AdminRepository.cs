@@ -108,16 +108,16 @@ namespace Read_Write_Slowly.Repositories_
             {
                 conn.Open();
 
-                // LEFT JOIN позволяет вытащить Название книги (если жалоба на книгу) 
-                // ИЛИ текст отзыва (если жалоба на отзыв)
                 string query = @"
-            SELECT c.ComplaintId, u.DisplayName, c.TargetType, c.TargetId, c.Reason, c.CreatedAt,
-                   ISNULL(b.Title, ISNULL(r.Text, 'Удаленный объект')) AS TargetDescription
-            FROM Complaint c
-            JOIN Users u ON c.UserId = u.UserId
-            LEFT JOIN Book b ON c.TargetType = 'book' AND c.TargetId = b.BookId
-            LEFT JOIN Review r ON c.TargetType = 'review' AND c.TargetId = r.ReviewId
-            ORDER BY c.ComplaintId ASC";
+    SELECT c.ComplaintId, u.DisplayName, c.TargetType, c.TargetId, c.Reason, c.CreatedAt,
+           ISNULL(b.Title, ISNULL(r.Text, 'Удаленный объект')) AS TargetDescription,
+           ru.DisplayName AS ReviewAuthorName
+    FROM Complaint c
+    JOIN Users u ON c.UserId = u.UserId
+    LEFT JOIN Book b ON c.TargetType = 'book' AND c.TargetId = b.BookId
+    LEFT JOIN Review r ON c.TargetType = 'review' AND c.TargetId = r.ReviewId
+    LEFT JOIN Users ru ON r.UserId = ru.UserId
+    ORDER BY c.ComplaintId ASC";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -132,7 +132,8 @@ namespace Read_Write_Slowly.Repositories_
                             TargetId = reader.GetInt32(3),
                             Reason = reader.GetString(4),
                             CreatedAt = reader.IsDBNull(5) ? "" : reader.GetDateTime(5).ToString("dd.MM.yyyy HH:mm"),
-                            TargetDescription = reader.GetString(6)
+                            TargetDescription = reader.GetString(6),
+                            ReviewAuthorName = reader.IsDBNull(7) ? null : reader.GetString(7)
                         });
                     }
                 }

@@ -24,6 +24,8 @@
             <ComboBox Width="180" Margin="0,0,15,0"
                       ItemsSource="{Binding Genres}"
                       SelectedItem="{Binding SelectedGenre}"
+                      DisplayMemberPath="Name"
+                      Foreground="#212121"
                       materialDesign:HintAssist.Hint="Жанр"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
 

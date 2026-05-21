@@ -15,5 +15,6 @@ namespace Read_Write_Slowly.Models_
         public string TargetDescription { get; set; } // Название книги или кусочек текста отзыва
         public string Reason { get; set; }
         public string CreatedAt { get; set; }
+        public string ReviewAuthorName { get; set; }
     }
 }

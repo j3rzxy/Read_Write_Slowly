@@ -84,11 +84,11 @@
                                 <TextBlock Text="Ваша оценка: " VerticalAlignment="Center"/>
                                 <ComboBox Width="70" Margin="10,0,0,0"
                                           SelectedValue="{Binding NewReviewRating}">
-                                    <system:Int32>5</system:Int32>
-                                    <system:Int32>4</system:Int32>
-                                    <system:Int32>3</system:Int32>
-                                    <system:Int32>2</system:Int32>
-                                    <system:Int32>1</system:Int32>
+                                    <system:Double>5</system:Double>
+                                    <system:Double>4</system:Double>
+                                    <system:Double>3</system:Double>
+                                    <system:Double>2</system:Double>
+                                    <system:Double>1</system:Double>
                                 </ComboBox>
                                 <materialDesign:PackIcon Kind="Star" Foreground="Gold"
                                                          Margin="5,0,0,0" VerticalAlignment="Center"/>

@@ -30,7 +30,11 @@ namespace Read_Write_Slowly.Repositories_
                 {
                     while (reader.Read())
                     {
-                        genres.Add(new Genre { GenreId = reader.GetInt32(0), Name = reader.GetString(1) });
+                        genres.Add(new Genre
+                        {
+                            GenreId = reader.GetInt32(0),
+                            Name = reader.GetString(1)
+                        });
                     }
                 }
             }
