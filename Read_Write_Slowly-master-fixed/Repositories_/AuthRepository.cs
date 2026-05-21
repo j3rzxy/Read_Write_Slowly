@@ -89,12 +89,11 @@ namespace Read_Write_Slowly.Repositories_
 
                 // Вставка нового пользователя. По умолчанию: RoleId = 1 (Читатель), IsFrozen = 0 (Не заморожен)
                 string insertQuery = @"
-                    INSERT INTO Users (UserId, Login, Email, PasswordHash, DisplayName, RegistrationDate, IsFrozen, RoleId) 
-                    VALUES (@userId, @login, @email, @password, @displayName, @regDate, 0, 1)";
+                    INSERT INTO Users (Login, Email, PasswordHash, DisplayName, RegistrationDate, IsFrozen, RoleId) 
+                    VALUES (@login, @email, @password, @displayName, @regDate, 0, 1)";
 
                 using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                 {
-                    insertCmd.Parameters.AddWithValue("@userId", newUserId);
                     insertCmd.Parameters.AddWithValue("@login", login);
                     insertCmd.Parameters.AddWithValue("@email", email);
                     insertCmd.Parameters.AddWithValue("@password", password);

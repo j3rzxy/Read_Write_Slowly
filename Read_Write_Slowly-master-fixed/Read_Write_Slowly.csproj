@@ -128,6 +128,7 @@
     </Compile>
     <Compile Include="ViewModels_\AdminViewModel.cs" />
     <Compile Include="ViewModels_\AuthorViewModel.cs" />
+    <Compile Include="ViewModels_\BookReaderViewModel.cs" />
     <Compile Include="ViewModels_\AuthViewModel.cs" />
     <Compile Include="ViewModels_\BookDetailsViewModel.cs" />
     <Compile Include="ViewModels_\CatalogViewModel.cs" />
@@ -146,6 +147,9 @@
     <Compile Include="View_\AuthWindow.xaml.cs">
       <DependentUpon>AuthWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View_\BookReaderWindow.xaml.cs">
+      <DependentUpon>BookReaderWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View_\BookPage.xaml.cs">
       <DependentUpon>BookPage.xaml</DependentUpon>
     </Compile>
@@ -159,6 +163,10 @@
       <DependentUpon>UserListsPage.xaml</DependentUpon>
     </Compile>
     <Page Include="View_\AuthWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View_\BookReaderWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

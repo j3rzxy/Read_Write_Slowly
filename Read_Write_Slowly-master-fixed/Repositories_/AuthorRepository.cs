@@ -126,14 +126,11 @@ namespace Read_Write_Slowly.Repositories_
                 }
 
                 string query = @"
-                    INSERT INTO UnfreezeRequest (UnfreezeRequestId, UserId, TargetType, TargetId, Reason, CreatedAt) 
-                    VALUES (@id, @userId, 'book', @bookId, @reason, @createdAt)";
+                    INSERT INTO UnfreezeRequest (TargetType, Reason, CreatedAt) 
+                    VALUES ('book', @reason, @createdAt)";
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    cmd.Parameters.AddWithValue("@id", newId);
-                    cmd.Parameters.AddWithValue("@userId", userId);
-                    cmd.Parameters.AddWithValue("@bookId", bookId);
                     cmd.Parameters.AddWithValue("@reason", reason);
                     cmd.Parameters.AddWithValue("@createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 

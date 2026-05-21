@@ -120,14 +120,14 @@ namespace Read_Write_Slowly.Repositories_
                 }
 
                 string insertQuery = @"
-                    INSERT INTO RoleApplication (RoleApplicationId, UserId, RequestedRoleId, Status, CreatedAt) 
-                    VALUES (@id, @userId, 2, 'pending', @createdAt)";
+                    INSERT INTO RoleApplication (UserId, RequestedRoleId, Status, CreatedAt) 
+                    VALUES (@userId, @requestedRoleId, 'pending', @createdAt)";
 
                 using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                 {
-                    insertCmd.Parameters.AddWithValue("@id", newId);
                     insertCmd.Parameters.AddWithValue("@userId", userId);
-                    insertCmd.Parameters.AddWithValue("@createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    insertCmd.Parameters.AddWithValue("@requestedRoleId", 2);
+                    insertCmd.Parameters.AddWithValue("@createdAt", DateTime.Now);
                     insertCmd.ExecuteNonQuery();
                 }
             }
@@ -149,13 +149,11 @@ namespace Read_Write_Slowly.Repositories_
                 }
 
                 string query = @"
-                    INSERT INTO UnfreezeRequest (UnfreezeRequestId, UserId, TargetType, TargetId, Reason, CreatedAt) 
-                    VALUES (@id, @userId, 'account', NULL, @reason, @createdAt)";
+                    INSERT INTO UnfreezeRequest (TargetType, TargetId, Reason, CreatedAt) 
+                    VALUES ('account', NULL, @reason, @createdAt)";
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    cmd.Parameters.AddWithValue("@id", newId);
-                    cmd.Parameters.AddWithValue("@userId", userId);
                     cmd.Parameters.AddWithValue("@reason", reason);
                     cmd.Parameters.AddWithValue("@createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                     cmd.ExecuteNonQuery();

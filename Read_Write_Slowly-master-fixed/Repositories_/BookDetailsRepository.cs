@@ -17,15 +17,15 @@ namespace Read_Write_Slowly.Repositories_
             cleanConnectionString = builder.ProviderConnectionString;
         }
 
-        // 1. Загрузка полной информации об одной книге (включая строку с жанрами)
+        // 1. Загрузка полной информации об одной книге (включая строку с жанрами, текст и автора)
         public Book GetBookById(int bookId)
         {
             using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
                 connection.Open();
-                // ИСПРАВЛЕНО: b.AuthorId → b.AuthorUserId (реальное имя столбца в БД)
                 string query = @"
                     SELECT b.BookId, b.Title, b.Description, b.CoverPath, u.DisplayName,
+                           b.ContentText, b.AuthorUserId,
                            (SELECT STRING_AGG(g.Name, ', ') 
                             FROM BookGenre bg 
                             JOIN Genre g ON bg.GenreId = g.GenreId 
@@ -43,18 +43,85 @@ namespace Read_Write_Slowly.Repositories_
                         {
                             return new Book
                             {
-                                BookId = reader.GetInt32(0),
-                                Title = reader.GetString(1),
+                                BookId      = reader.GetInt32(0),
+                                Title       = reader.GetString(1),
                                 Description = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                                CoverPath = reader.IsDBNull(3) ? "pack://application:,,,/Resources/no_cover.png" : reader.GetString(3),
-                                AuthorName = reader.GetString(4),
-                                Genres = reader.IsDBNull(5) ? new List<string>(): new List<string>(reader.GetString(5).Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries))
+                                CoverPath   = reader.IsDBNull(3) ? "pack://application:,,,/Resources/no_cover.png" : reader.GetString(3),
+                                AuthorName  = reader.GetString(4),
+                                ContentText = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                                AuthorUserId = reader.GetInt32(6),
+                                Genres      = reader.IsDBNull(7)
+                                              ? new List<string>()
+                                              : new List<string>(reader.GetString(7).Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries))
                             };
                         }
                     }
                 }
             }
             return null;
+        }
+
+        // 7. Удаление книги (только автор или администратор)
+        public bool DeleteBook(int bookId, int requestingUserId, bool isAdmin)
+        {
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
+            {
+                connection.Open();
+
+                // Проверяем, что удаляющий — автор книги или администратор
+                string ownerQuery = "SELECT AuthorUserId FROM Book WHERE BookId = @bookId";
+                int authorId;
+                using (SqlCommand ownerCmd = new SqlCommand(ownerQuery, connection))
+                {
+                    ownerCmd.Parameters.AddWithValue("@bookId", bookId);
+                    object result = ownerCmd.ExecuteScalar();
+                    if (result == null) return false;
+                    authorId = (int)result;
+                }
+
+                if (!isAdmin && authorId != requestingUserId)
+                    return false;
+
+                // Каскадно удаляем зависимые записи, затем саму книгу
+                using (SqlTransaction tx = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        string[] deleteDeps = new[]
+                        {
+                            "DELETE FROM UnfreezeRequest WHERE TargetType = 'book' AND TargetId = @id",
+                            "DELETE FROM Complaint       WHERE TargetType = 'book' AND TargetId = @id",
+                            "DELETE FROM Review          WHERE BookId = @id",
+                            "DELETE FROM ReadingList     WHERE BookId = @id",
+                            "DELETE FROM BookGenre       WHERE BookId = @id",
+                        };
+
+                        foreach (string sql in deleteDeps)
+                        {
+                            using (SqlCommand cmd = new SqlCommand(sql, connection, tx))
+                            {
+                                cmd.Parameters.AddWithValue("@id", bookId);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        using (SqlCommand delBook = new SqlCommand(
+                            "DELETE FROM Book WHERE BookId = @id", connection, tx))
+                        {
+                            delBook.Parameters.AddWithValue("@id", bookId);
+                            delBook.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        tx.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         // 2. Получение незамороженных отзывов к книге
