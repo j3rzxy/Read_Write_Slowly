@@ -70,6 +70,7 @@
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Converters\ParamConverter.cs" />
+    <Compile Include="Converters\PathToImageConverter.cs" />
     <Compile Include="Genre.cs">
       <DependentUpon>ShutIKrolDB.tt</DependentUpon>
     </Compile>
@@ -266,5 +267,6 @@
       <LastGenOutput>ShutIKrolDB.cs</LastGenOutput>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

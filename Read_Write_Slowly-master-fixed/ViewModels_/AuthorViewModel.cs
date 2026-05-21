@@ -11,6 +11,8 @@ namespace Read_Write_Slowly.ViewModels_
         private readonly AuthorRepository _repository;
         private readonly int _authorUserId;
 
+        public ICommand BrowseCoverCommand { get; }
+
         public ObservableCollection<Book> MyBooks { get; set; }
 
         private Book _selectedBook;
@@ -62,10 +64,22 @@ namespace Read_Write_Slowly.ViewModels_
             SaveBookCommand = new RelayCommand(SaveBook);
             ClearFormCommand = new RelayCommand(ResetForm);
             SubmitUnfreezeCommand = new RelayCommand(SubmitUnfreeze);
+            BrowseCoverCommand = new RelayCommand(BrowseCover);
 
             RefreshList();
         }
 
+        private void BrowseCover()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Выберите обложку книги",
+                Filter = "Изображения|*.jpg;*.jpeg;*.png;*.bmp;*.gif|Все файлы|*.*"
+            };
+
+            if (dialog.ShowDialog() == true)
+                FormCoverPath = dialog.FileName;
+        }
         private void RefreshList()
         {
             MyBooks.Clear();
