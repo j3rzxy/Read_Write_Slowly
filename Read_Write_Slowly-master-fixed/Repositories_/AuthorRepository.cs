@@ -70,12 +70,11 @@ namespace Read_Write_Slowly.Repositories_
                 }
 
                 string query = @"
-                    INSERT INTO Book (BookId, Title, Description, CoverPath, ContentText, AuthorUserId, IsFrozen) 
-                    VALUES (@bookId, @title, @desc, @cover, @content, @authorId, 0)";
+                    INSERT INTO Book (Title, Description, CoverPath, ContentText, AuthorUserId, IsFrozen) 
+                    VALUES (@title, @desc, @cover, @content, @authorId, 0)";
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    cmd.Parameters.AddWithValue("@bookId", newBookId);
                     cmd.Parameters.AddWithValue("@title", book.Title);
                     cmd.Parameters.AddWithValue("@desc", book.Description ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@cover", string.IsNullOrWhiteSpace(book.CoverPath) ? "pack://application:,,,/Resources/no_cover.png" : book.CoverPath);
