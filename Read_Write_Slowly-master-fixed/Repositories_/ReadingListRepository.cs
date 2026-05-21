@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
-using Read_Write_Slowly.Models_;
-using Book = Read_Write_Slowly.Models_.Book;
-using Genre = Read_Write_Slowly.Models_.Genre;
 
 namespace Read_Write_Slowly.Repositories_
 {
     public class ReadingListRepository
     {
-        private readonly string _connectionString;
-
+        public string cleanConnectionString;
         public ReadingListRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            var entityString = ConfigurationManager.ConnectionStrings["ShutIKrolEntities"].ConnectionString;
+
+            var builder = new EntityConnectionStringBuilder(entityString);
+            cleanConnectionString = builder.ProviderConnectionString;
         }
 
         // 1. Загрузка книг из конкретного списка пользователя с учетом поиска, фильтра и сортировки
@@ -22,9 +22,9 @@ namespace Read_Write_Slowly.Repositories_
         {
             var books = new List<Book>();
 
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Выбираем книги, которые добавлены у конкретного пользователя в определенный статус (ReadingList.Status)
                 // Книги, замороженные авторами/админами, скрываем
@@ -57,7 +57,7 @@ namespace Read_Write_Slowly.Repositories_
                 else
                     query += " ORDER BY b.Title ASC";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
                     cmd.Parameters.AddWithValue("@status", listStatus);
@@ -91,12 +91,12 @@ namespace Read_Write_Slowly.Repositories_
         // 2. Быстрое изменение статуса книги (перемещение в другой список)
         public void MoveBookToAnotherList(int userId, int bookId, string newStatus)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
                 string query = "UPDATE ReadingList SET Status = @newStatus WHERE UserId = @userId AND BookId = @bookId";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@newStatus", newStatus);
                     cmd.Parameters.AddWithValue("@userId", userId);

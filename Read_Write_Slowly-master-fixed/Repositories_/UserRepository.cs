@@ -1,22 +1,24 @@
 ﻿using Read_Write_Slowly.Models_;
 using System.Configuration;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
 
 namespace Read_Write_Slowly.Repositories_
 {
     public class UserRepository
     {
-        private readonly string _connectionString;
-
+        public string cleanConnectionString;
         public UserRepository()
         {
-            _connectionString = ConfigurationManager
-                .ConnectionStrings["DefaultConnection"].ConnectionString;
+            var entityString = ConfigurationManager.ConnectionStrings["ShutIKrolEntities"].ConnectionString;
+
+            var builder = new EntityConnectionStringBuilder(entityString);
+            cleanConnectionString = builder.ProviderConnectionString;
         }
 
         public User AuthenticateUser(string login, string passwordHash)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = new SqlConnection(cleanConnectionString))
             {
                 connection.Open();
                 string query = @"
@@ -44,7 +46,7 @@ namespace Read_Write_Slowly.Repositories_
         // Получение пользователя по его Id (используется в UserListsViewModel)
         public User GetUserById(int userId)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = new SqlConnection(cleanConnectionString))
             {
                 connection.Open();
                 string query = @"

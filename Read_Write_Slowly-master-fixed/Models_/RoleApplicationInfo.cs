@@ -15,6 +15,6 @@ namespace Read_Write_Slowly.Models_
         public int RequestedRoleId { get; set; }
         public string RequestedRoleName { get; set; }
         public string Status { get; set; }
-        public string CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

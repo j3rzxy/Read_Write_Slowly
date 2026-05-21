@@ -9,8 +9,9 @@
         WindowStartupLocation="CenterScreen"
         Background="#F5F6FA">
 
-    <!-- DataTemplate: WPF автоматически выбирает нужный View по типу ViewModel -->
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        
         <DataTemplate DataType="{x:Type viewmodels:CatalogViewModel}">
             <views:CatalogPage />
         </DataTemplate>

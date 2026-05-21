@@ -1,35 +1,38 @@
 ﻿using Read_Write_Slowly.Models_;
-using Book = Read_Write_Slowly.Models_.Book;
-using Review = Read_Write_Slowly.Models_.Review;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
+using Book = Read_Write_Slowly.Models_.Book;
+using Review = Read_Write_Slowly.Models_.Review;
 
 namespace Read_Write_Slowly.Repositories_
 {
     public class ProfileRepository
     {
-        private readonly string _connectionString;
-
+        public string cleanConnectionString;
         public ProfileRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            var entityString = ConfigurationManager.ConnectionStrings["ShutIKrolEntities"].ConnectionString;
+
+            var builder = new EntityConnectionStringBuilder(entityString);
+            cleanConnectionString = builder.ProviderConnectionString;
         }
 
         // 1. Получить полную информацию о пользователе (включая имя роли)
         public User GetUserProfile(int userId)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
                 string query = @"
                     SELECT u.UserId, u.Login, u.Email, u.DisplayName, u.RegistrationDate, u.IsFrozen, u.RoleId, r.Name
                     FROM Users u
                     INNER JOIN Role r ON u.RoleId = r.RoleId
                     WHERE u.UserId = @userId";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -58,9 +61,9 @@ namespace Read_Write_Slowly.Repositories_
         public List<Review> GetUserReviews(int userId)
         {
             var reviews = new List<Review>();
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
                 string query = @"
                     SELECT r.ReviewId, r.BookId, b.Title, r.Text, r.Rating, r.CreatedAt
                     FROM Review r
@@ -68,7 +71,7 @@ namespace Read_Write_Slowly.Repositories_
                     WHERE r.UserId = @userId
                     ORDER BY r.ReviewId DESC";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -94,13 +97,13 @@ namespace Read_Write_Slowly.Repositories_
         // 3. Подать заявку на роль Автора (проверяет, нет ли уже активной заявки)
         public bool CheckAndApplyForAuthor(int userId)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Проверяем, нет ли уже отправленной заявки в статусе 'pending'
                 string checkQuery = "SELECT COUNT(1) FROM RoleApplication WHERE UserId = @userId AND RequestedRoleId = 2 AND Status = 'pending'";
-                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
                 {
                     checkCmd.Parameters.AddWithValue("@userId", userId);
                     int exists = (int)checkCmd.ExecuteScalar();
@@ -111,7 +114,7 @@ namespace Read_Write_Slowly.Repositories_
                 // Получаем максимальный ID для генерации (так как PK не IDENTITY в скрипте)
                 string idQuery = "SELECT ISNULL(MAX(RoleApplicationId), 0) + 1 FROM RoleApplication";
                 int newId = 1;
-                using (SqlCommand idCmd = new SqlCommand(idQuery, conn))
+                using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
                 {
                     newId = (int)idCmd.ExecuteScalar();
                 }
@@ -120,7 +123,7 @@ namespace Read_Write_Slowly.Repositories_
                     INSERT INTO RoleApplication (RoleApplicationId, UserId, RequestedRoleId, Status, CreatedAt) 
                     VALUES (@id, @userId, 2, 'pending', @createdAt)";
 
-                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                 {
                     insertCmd.Parameters.AddWithValue("@id", newId);
                     insertCmd.Parameters.AddWithValue("@userId", userId);
@@ -134,13 +137,13 @@ namespace Read_Write_Slowly.Repositories_
         // 4. Отправить запрос на разморозку аккаунта
         public void SendUnfreezeRequest(int userId, string reason)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string idQuery = "SELECT ISNULL(MAX(UnfreezeRequestId), 0) + 1 FROM UnfreezeRequest";
                 int newId = 1;
-                using (SqlCommand idCmd = new SqlCommand(idQuery, conn))
+                using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
                 {
                     newId = (int)idCmd.ExecuteScalar();
                 }
@@ -149,7 +152,7 @@ namespace Read_Write_Slowly.Repositories_
                     INSERT INTO UnfreezeRequest (UnfreezeRequestId, UserId, TargetType, TargetId, Reason, CreatedAt) 
                     VALUES (@id, @userId, 'account', NULL, @reason, @createdAt)";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", newId);
                     cmd.Parameters.AddWithValue("@userId", userId);

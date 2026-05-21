@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -11,18 +12,20 @@ namespace Read_Write_Slowly.Repositories_
 {
     public class AdminRepository
     {
-        private readonly string _connectionString;
-
+        public string cleanConnectionString;
         public AdminRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            var entityString = ConfigurationManager.ConnectionStrings["ShutIKrolEntities"].ConnectionString;
+
+            var builder = new EntityConnectionStringBuilder(entityString);
+            cleanConnectionString = builder.ProviderConnectionString;
         }
 
         // 1. Получить все активные (pending) заявки на роли
         public List<RoleApplicationInfo> GetPendingRoleApplications()
         {
             var list = new List<RoleApplicationInfo>();
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
             {
                 conn.Open();
                 string query = @"
@@ -47,7 +50,7 @@ namespace Read_Write_Slowly.Repositories_
                             RequestedRoleId = reader.GetInt32(4),
                             RequestedRoleName = reader.GetString(5),
                             Status = reader.GetString(6),
-                            CreatedAt = reader.IsDBNull(7) ? "" : reader.GetDateTime(7).ToString("dd.MM.yyyy HH:mm")
+                            CreatedAt = reader.GetDateTime(7)
                         });
                     }
                 }
@@ -58,7 +61,7 @@ namespace Read_Write_Slowly.Repositories_
         // 2. Обработка заявки на роль (Одобрение / Отклонение)
         public void ProcessRoleApplication(int applicationId, int userId, int requestedRoleId, bool approve)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
             {
                 conn.Open();
                 using (SqlTransaction transaction = conn.BeginTransaction())
@@ -101,7 +104,7 @@ namespace Read_Write_Slowly.Repositories_
         public List<ComplaintInfo> GetComplaints()
         {
             var list = new List<ComplaintInfo>();
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
             {
                 conn.Open();
 
@@ -140,7 +143,7 @@ namespace Read_Write_Slowly.Repositories_
         // 3. Обработка жалобы (Удовлетворить или Отклонить)
         public void ProcessComplaint(ComplaintInfo complaint, bool approve)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
             {
                 conn.Open();
                 using (SqlTransaction transaction = conn.BeginTransaction())
@@ -194,7 +197,7 @@ namespace Read_Write_Slowly.Repositories_
         public List<UnfreezeRequestInfo> GetActiveUnfreezeRequests()
         {
             var list = new List<UnfreezeRequestInfo>();
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
             {
                 conn.Open();
                 // Используем LEFT JOIN на таблицу Book, чтобы достать название книги, если TargetType = 'book'
@@ -223,7 +226,7 @@ namespace Read_Write_Slowly.Repositories_
                             TargetId = reader.IsDBNull(4) ? (int?)null : reader.GetInt32(4),
                             TargetName = targetName,
                             Reason = reader.GetString(6),
-                            CreatedAt = reader.IsDBNull(7) ? "" : reader.GetDateTime(7).ToString("dd.MM.yyyy HH:mm")
+                            CreatedAt = reader.GetDateTime(7)
                         });
                     }
                 }
@@ -234,7 +237,7 @@ namespace Read_Write_Slowly.Repositories_
         // 5. Выполнение разморозки (и удаление обработанного запроса)
         public void ProcessUnfreezeRequest(UnfreezeRequestInfo request, bool approve)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
             {
                 conn.Open();
                 using (SqlTransaction transaction = conn.BeginTransaction())

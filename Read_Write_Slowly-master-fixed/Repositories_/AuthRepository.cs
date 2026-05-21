@@ -1,32 +1,36 @@
 ﻿using Read_Write_Slowly.Models_;
 using System;
 using System.Configuration;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
 
 namespace Read_Write_Slowly.Repositories_
 {
     public class AuthRepository
     {
-        private readonly string _connectionString;
-
+        public string cleanConnectionString;
         public AuthRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            var entityString = ConfigurationManager.ConnectionStrings["ShutIKrolEntities"].ConnectionString;
+
+            var builder = new EntityConnectionStringBuilder(entityString);
+            cleanConnectionString = builder.ProviderConnectionString;
         }
 
         // 1. Авторизация пользователя
         public User Login(string loginOrEmail, string password)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
                 // Проверяем совпадение по логину ИЛИ email
                 string query = @"
                     SELECT UserId, Login, Email, DisplayName, RegistrationDate, IsFrozen, RoleId 
                     FROM Users 
                     WHERE (Login = @loginOrEmail OR Email = @loginOrEmail) AND PasswordHash = @password";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@loginOrEmail", loginOrEmail);
                     cmd.Parameters.AddWithValue("@password", password); // В учебных целях храним строкой. 
@@ -57,13 +61,13 @@ namespace Read_Write_Slowly.Repositories_
         {
             errorMessage = string.Empty;
 
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Проверка: существует ли уже пользователь с таким логином или email
                 string checkQuery = "SELECT COUNT(1) FROM Users WHERE Login = @login OR Email = @email";
-                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
                 {
                     checkCmd.Parameters.AddWithValue("@login", login);
                     checkCmd.Parameters.AddWithValue("@email", email);
@@ -78,7 +82,7 @@ namespace Read_Write_Slowly.Repositories_
                 // Генерация нового UserId (так как IDENTITY отключен в скрипте)
                 string idQuery = "SELECT ISNULL(MAX(UserId), 0) + 1 FROM Users";
                 int newUserId = 1;
-                using (SqlCommand idCmd = new SqlCommand(idQuery, conn))
+                using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
                 {
                     newUserId = (int)idCmd.ExecuteScalar();
                 }
@@ -88,7 +92,7 @@ namespace Read_Write_Slowly.Repositories_
                     INSERT INTO Users (UserId, Login, Email, PasswordHash, DisplayName, RegistrationDate, IsFrozen, RoleId) 
                     VALUES (@userId, @login, @email, @password, @displayName, @regDate, 0, 1)";
 
-                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                 {
                     insertCmd.Parameters.AddWithValue("@userId", newUserId);
                     insertCmd.Parameters.AddWithValue("@login", login);

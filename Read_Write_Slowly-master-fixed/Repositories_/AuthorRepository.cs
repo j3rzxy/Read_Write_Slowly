@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
 
 namespace Read_Write_Slowly.Repositories_
 {
     public class AuthorRepository
     {
-        private readonly string _connectionString;
-
+        public string cleanConnectionString;
         public AuthorRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            var entityString = ConfigurationManager.ConnectionStrings["ShutIKrolEntities"].ConnectionString;
+
+            var builder = new EntityConnectionStringBuilder(entityString);
+            cleanConnectionString = builder.ProviderConnectionString;
         }
 
         // 1. Получить все книги автора (включая замороженные)
         public List<Book> GetBooksByAuthor(int authorUserId)
         {
             var books = new List<Book>();
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
                 string query = @"
                     SELECT BookId, Title, Description, CoverPath, ContentText, IsFrozen 
                     FROM Book 
                     WHERE AuthorUserId = @authorId
                     ORDER BY BookId DESC";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@authorId", authorUserId);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -54,14 +57,14 @@ namespace Read_Write_Slowly.Repositories_
         // 2. Добавление новой книги (с ручной генерацией BookId)
         public void AddBook(Book book)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // Генерируем новый BookId
                 string idQuery = "SELECT ISNULL(MAX(BookId), 0) + 1 FROM Book";
                 int newBookId = 1;
-                using (SqlCommand idCmd = new SqlCommand(idQuery, conn))
+                using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
                 {
                     newBookId = (int)idCmd.ExecuteScalar();
                 }
@@ -70,7 +73,7 @@ namespace Read_Write_Slowly.Repositories_
                     INSERT INTO Book (BookId, Title, Description, CoverPath, ContentText, AuthorUserId, IsFrozen) 
                     VALUES (@bookId, @title, @desc, @cover, @content, @authorId, 0)";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@bookId", newBookId);
                     cmd.Parameters.AddWithValue("@title", book.Title);
@@ -87,15 +90,15 @@ namespace Read_Write_Slowly.Repositories_
         // 3. Обновление существующей книги
         public void UpdateBook(Book book)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
                 string query = @"
                     UPDATE Book 
                     SET Title = @title, Description = @desc, CoverPath = @cover, ContentText = @content 
                     WHERE BookId = @bookId AND AuthorUserId = @authorId";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@title", book.Title);
                     cmd.Parameters.AddWithValue("@desc", book.Description ?? (object)DBNull.Value);
@@ -112,13 +115,13 @@ namespace Read_Write_Slowly.Repositories_
         // 4. Отправить запрос на разморозку КНИГИ (TargetType = 'book', TargetId = BookId)
         public void SendBookUnfreezeRequest(int userId, int bookId, string reason)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 string idQuery = "SELECT ISNULL(MAX(UnfreezeRequestId), 0) + 1 FROM UnfreezeRequest";
                 int newId = 1;
-                using (SqlCommand idCmd = new SqlCommand(idQuery, conn))
+                using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
                 {
                     newId = (int)idCmd.ExecuteScalar();
                 }
@@ -127,7 +130,7 @@ namespace Read_Write_Slowly.Repositories_
                     INSERT INTO UnfreezeRequest (UnfreezeRequestId, UserId, TargetType, TargetId, Reason, CreatedAt) 
                     VALUES (@id, @userId, 'book', @bookId, @reason, @createdAt)";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@id", newId);
                     cmd.Parameters.AddWithValue("@userId", userId);

@@ -3,17 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              StartupUri="View_/AuthWindow.xaml">
-    <!-- Проверьте, что здесь указано ваше стартовое окно -->
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
 
-                <!-- НОВЫЙ СИНТАКСИС ДЛЯ MATERIAL DESIGN 5.0+ -->
-                <materialDesign:BundledTheme BaseTheme="Light" 
-                                             PrimaryColor="DeepPurple" 
-                                             SecondaryColor="Lime" />
-
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+                </ResourceDictionary>
+                
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="MaterialDesignNavTabControl" 
+               TargetType="TabControl" 
+               BasedOn="{StaticResource MaterialDesignTabControl}" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

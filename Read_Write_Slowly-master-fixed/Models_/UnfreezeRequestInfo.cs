@@ -15,6 +15,6 @@ namespace Read_Write_Slowly.Models_
         public int? TargetId { get; set; }     // Будет Null для аккаунта, или ID книги
         public string TargetName { get; set; }   // "Весь аккаунт" или Название книги
         public string Reason { get; set; }
-        public string CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

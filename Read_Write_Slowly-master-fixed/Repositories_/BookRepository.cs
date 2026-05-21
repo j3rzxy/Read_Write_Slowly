@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
-using Book = Read_Write_Slowly.Models_.Book;
-using Review = Read_Write_Slowly.Models_.Review;
-using Genre = Read_Write_Slowly.Models_.Genre;
 
 namespace Read_Write_Slowly.Repositories_
 {
     public class BookRepository
     {
-        private readonly string _connectionString;
-
+        public string cleanConnectionString;
         public BookRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            var entityString = ConfigurationManager.ConnectionStrings["ShutIKrolEntities"].ConnectionString;
+
+            var builder = new EntityConnectionStringBuilder(entityString);
+            cleanConnectionString = builder.ProviderConnectionString;
         }
 
         // 1. Получение списка жанров для ComboBox фильтрации
         public List<Genre> GetGenres()
         {
             var genres = new List<Genre>();
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
                 string query = "SELECT GenreId, Name FROM Genre ORDER BY Name";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -42,9 +42,9 @@ namespace Read_Write_Slowly.Repositories_
         {
             var books = new List<Book>();
 
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
-                conn.Open();
+                connection.Open();
 
                 // ИСПРАВЛЕНО: b.AuthorId → b.AuthorUserId во всех частях запроса
                 string query = @"
@@ -69,7 +69,7 @@ namespace Read_Write_Slowly.Repositories_
                 else
                     query += " ORDER BY b.Title ASC";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     if (!string.IsNullOrWhiteSpace(searchText))
                         cmd.Parameters.AddWithValue("@search", $"%{searchText}%");
@@ -100,7 +100,7 @@ namespace Read_Write_Slowly.Repositories_
         // 3. Добавление или перемещение книги в список чтения пользователя
         public void AddBookToReadingList(int userId, int bookId, string listStatus)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
             {
                 conn.Open();
                 string checkQuery = "SELECT COUNT(1) FROM ReadingList WHERE UserId = @userId AND BookId = @bookId";

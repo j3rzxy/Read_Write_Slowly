@@ -91,7 +91,7 @@
 
                                                     <materialDesign:PopupBox Grid.Column="1" Style="{StaticResource MaterialDesignPopupBox}" Margin="5,0,0,0">
                                                         <materialDesign:PopupBox.ToggleContent>
-                                                            <materialDesign:PackIcon Kind="Move" Width="24" Height="24" ToolTip="Переместить в другой список"/>
+                                                            <materialDesign:PackIcon Width="24" Height="24" ToolTip="Переместить в другой список"/>
                                                         </materialDesign:PopupBox.ToggleContent>
                                                         <StackPanel>
                                                             <Button Content="В планах" Command="{Binding DataContext.MoveBookCommand, RelativeSource={RelativeSource AncestorType=UserControl}}">
