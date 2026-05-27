@@ -1,8 +1,14 @@
-﻿using Read_Write_Slowly.Models_;
+using Read_Write_Slowly.Models_;
 using Read_Write_Slowly.Repositories_;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+
+// Алиасы для разрешения конфликта между EF-классами и Models_-классами
+using BookModel = Read_Write_Slowly.Models_.Book;
+using SelectableGenreModel = Read_Write_Slowly.Models_.SelectableGenre;
 
 namespace Read_Write_Slowly.ViewModels_
 {
@@ -13,10 +19,13 @@ namespace Read_Write_Slowly.ViewModels_
 
         public ICommand BrowseCoverCommand { get; }
 
-        public ObservableCollection<Book> MyBooks { get; set; }
+        public ObservableCollection<BookModel> MyBooks { get; set; }
 
-        private Book _selectedBook;
-        public Book SelectedBook
+        // Список всех жанров с флагом выбора
+        public ObservableCollection<SelectableGenreModel> AllGenres { get; set; }
+
+        private BookModel _selectedBook;
+        public BookModel SelectedBook
         {
             get => _selectedBook;
             set { _selectedBook = value; OnPropertyChanged(); LoadSelectedBookToForm(); }
@@ -54,19 +63,35 @@ namespace Read_Write_Slowly.ViewModels_
         public ICommand ClearFormCommand { get; }
         public ICommand SubmitUnfreezeCommand { get; }
 
-        // Принимает реальный userId автора из сессии
         public AuthorViewModel(int authorUserId)
         {
             _authorUserId = authorUserId;
             _repository = new AuthorRepository();
-            MyBooks = new ObservableCollection<Book>();
+            MyBooks = new ObservableCollection<BookModel>();
+            AllGenres = new ObservableCollection<SelectableGenreModel>();
 
             SaveBookCommand = new RelayCommand(SaveBook);
             ClearFormCommand = new RelayCommand(ResetForm);
             SubmitUnfreezeCommand = new RelayCommand(SubmitUnfreeze);
             BrowseCoverCommand = new RelayCommand(BrowseCover);
 
+            LoadGenres();
             RefreshList();
+        }
+
+        private void LoadGenres()
+        {
+            AllGenres.Clear();
+            var genres = _repository.GetAllGenres();
+            foreach (var g in genres)
+            {
+                AllGenres.Add(new SelectableGenreModel
+                {
+                    GenreId = g.GenreId,
+                    Name = g.Name,
+                    IsSelected = false
+                });
+            }
         }
 
         private void BrowseCover()
@@ -80,6 +105,7 @@ namespace Read_Write_Slowly.ViewModels_
             if (dialog.ShowDialog() == true)
                 FormCoverPath = dialog.FileName;
         }
+
         private void RefreshList()
         {
             MyBooks.Clear();
@@ -95,6 +121,11 @@ namespace Read_Write_Slowly.ViewModels_
                 FormDescription = SelectedBook.Description;
                 FormCoverPath = SelectedBook.CoverPath;
                 FormContentText = SelectedBook.ContentText;
+
+                // Загружаем жанры книги и помечаем выбранные
+                var bookGenreIds = _repository.GetBookGenreIds(SelectedBook.BookId);
+                foreach (var g in AllGenres)
+                    g.IsSelected = bookGenreIds.Contains(g.GenreId);
             }
             else
             {
@@ -113,6 +144,9 @@ namespace Read_Write_Slowly.ViewModels_
                 return;
             }
 
+            var selectedGenreIds = new System.Collections.Generic.List<int>(
+                AllGenres.Where(g => g.IsSelected).Select(g => g.GenreId));
+
             if (IsEditMode)
             {
                 SelectedBook.Title = FormTitle;
@@ -121,11 +155,12 @@ namespace Read_Write_Slowly.ViewModels_
                 SelectedBook.ContentText = FormContentText;
 
                 _repository.UpdateBook(SelectedBook);
+                _repository.SaveBookGenres(SelectedBook.BookId, selectedGenreIds);
                 MessageBox.Show("Книга успешно обновлена!", "Успех");
             }
             else
             {
-                var newBook = new Book
+                var newBook = new BookModel
                 {
                     Title = FormTitle,
                     Description = FormDescription,
@@ -134,6 +169,15 @@ namespace Read_Write_Slowly.ViewModels_
                     AuthorUserId = _authorUserId
                 };
                 _repository.AddBook(newBook);
+
+                // Получаем ID только что добавленной книги и сохраняем жанры
+                if (selectedGenreIds.Count > 0)
+                {
+                    int newBookId = _repository.GetLastInsertedBookId(FormTitle, _authorUserId);
+                    if (newBookId > 0)
+                        _repository.SaveBookGenres(newBookId, selectedGenreIds);
+                }
+
                 MessageBox.Show("Новая книга успешно опубликована!", "Успех");
             }
 
@@ -161,6 +205,10 @@ namespace Read_Write_Slowly.ViewModels_
             FormCoverPath = "";
             FormContentText = "";
             UnfreezeReason = "";
+
+            // Снимаем все выбранные жанры
+            foreach (var g in AllGenres)
+                g.IsSelected = false;
 
             OnPropertyChanged(nameof(SelectedBook));
             OnPropertyChanged(nameof(IsEditMode));

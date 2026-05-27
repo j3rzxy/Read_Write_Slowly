@@ -81,6 +81,7 @@
     <Compile Include="Models_\Review.cs" />
     <Compile Include="Models_\Review.Partial.cs" />
     <Compile Include="Models_\RoleApplicationInfo.cs" />
+    <Compile Include="Models_\SelectableGenre.cs" />
     <Compile Include="Models_\UnfreezeRequestInfo.cs" />
     <Compile Include="Models_\User.cs" />
     <Compile Include="ReadingList.cs">

@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Read_Write_Slowly.Models_;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
+
+using BookModel  = Read_Write_Slowly.Models_.Book;
+using GenreModel = Read_Write_Slowly.Models_.Genre;
 
 namespace Read_Write_Slowly.Repositories_
 {
@@ -18,9 +22,9 @@ namespace Read_Write_Slowly.Repositories_
         }
 
         // 1. Получить все книги автора (включая замороженные)
-        public List<Book> GetBooksByAuthor(int authorUserId)
+        public List<BookModel> GetBooksByAuthor(int authorUserId)
         {
-            var books = new List<Book>();
+            var books = new List<BookModel>();
             using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
                 connection.Open();
@@ -37,7 +41,7 @@ namespace Read_Write_Slowly.Repositories_
                     {
                         while (reader.Read())
                         {
-                            books.Add(new Book
+                            books.Add(new BookModel
                             {
                                 BookId = reader.GetInt32(0),
                                 Title = reader.GetString(1),
@@ -55,7 +59,7 @@ namespace Read_Write_Slowly.Repositories_
         }
 
         // 2. Добавление новой книги (с ручной генерацией BookId)
-        public void AddBook(Book book)
+        public void AddBook(BookModel book)
         {
             using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
@@ -87,7 +91,7 @@ namespace Read_Write_Slowly.Repositories_
         }
 
         // 3. Обновление существующей книги
-        public void UpdateBook(Book book)
+        public void UpdateBook(BookModel book)
         {
             using (SqlConnection connection = new SqlConnection(cleanConnectionString))
             {
@@ -111,7 +115,115 @@ namespace Read_Write_Slowly.Repositories_
             }
         }
 
-        // 4. Отправить запрос на разморозку КНИГИ (TargetType = 'book', TargetId = BookId)
+        // 4. Получить все жанры из БД
+        public List<GenreModel> GetAllGenres()
+        {
+            var genres = new List<GenreModel>();
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
+            {
+                connection.Open();
+                string query = "SELECT GenreId, Name FROM Genre ORDER BY Name";
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        genres.Add(new GenreModel
+                        {
+                            GenreId = reader.GetInt32(0),
+                            Name = reader.GetString(1)
+                        });
+                    }
+                }
+            }
+            return genres;
+        }
+
+        // 5. Получить жанры конкретной книги (список GenreId)
+        public List<int> GetBookGenreIds(int bookId)
+        {
+            var ids = new List<int>();
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
+            {
+                connection.Open();
+                string query = "SELECT GenreId FROM BookGenre WHERE BookId = @bookId";
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@bookId", bookId);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                            ids.Add(reader.GetInt32(0));
+                    }
+                }
+            }
+            return ids;
+        }
+
+        // 6. Сохранить жанры книги (удаляем старые, вставляем новые)
+        public void SaveBookGenres(int bookId, List<int> selectedGenreIds)
+        {
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
+            {
+                connection.Open();
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Удаляем все текущие жанры книги
+                        string deleteQuery = "DELETE FROM BookGenre WHERE BookId = @bookId";
+                        using (SqlCommand cmd = new SqlCommand(deleteQuery, connection, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@bookId", bookId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Вставляем выбранные жанры
+                        foreach (int genreId in selectedGenreIds)
+                        {
+                            string insertQuery = @"
+                                INSERT INTO BookGenre (BookId, GenreId)
+                                VALUES (@bookId, @genreId)";
+                            using (SqlCommand cmd = new SqlCommand(insertQuery, connection, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@bookId", bookId);
+                                cmd.Parameters.AddWithValue("@genreId", genreId);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        // 7. Получить BookId только что добавленной книги (последняя по Title + AuthorUserId)
+        public int GetLastInsertedBookId(string title, int authorUserId)
+        {
+            using (SqlConnection connection = new SqlConnection(cleanConnectionString))
+            {
+                connection.Open();
+                string query = @"
+                    SELECT TOP 1 BookId FROM Book
+                    WHERE Title = @title AND AuthorUserId = @authorId
+                    ORDER BY BookId DESC";
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@title", title);
+                    cmd.Parameters.AddWithValue("@authorId", authorUserId);
+                    object result = cmd.ExecuteScalar();
+                    return result != null ? (int)result : -1;
+                }
+            }
+        }
+
+        // 8. Отправить запрос на разморозку КНИГИ (TargetType = 'book', TargetId = BookId)
         public void SendBookUnfreezeRequest(int userId, int bookId, string reason)
         {
             using (SqlConnection connection = new SqlConnection(cleanConnectionString))

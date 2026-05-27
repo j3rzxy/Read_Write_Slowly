@@ -8,6 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using BookModel  = Read_Write_Slowly.Models_.Book;
+using GenreModel = Read_Write_Slowly.Models_.Genre;
+using UserModel  = Read_Write_Slowly.Models_.User;
+
 namespace Read_Write_Slowly.Repositories_
 {
     public class AdminRepository
@@ -286,6 +290,124 @@ namespace Read_Write_Slowly.Repositories_
                     }
                 }
             }
+        }
+        // Получить все жанры
+        public List<GenreModel> GetAllGenres()
+        {
+            var genres = new List<GenreModel>();
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
+            {
+                conn.Open();
+                string query = "SELECT GenreId, Name FROM Genre ORDER BY Name";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        genres.Add(new GenreModel
+                        {
+                            GenreId = reader.GetInt32(0),
+                            Name = reader.GetString(1)
+                        });
+                    }
+                }
+            }
+            return genres;
+        }
+
+        // Добавить книгу (от имени выбранного автора или администратора)
+        public int AddBook(BookModel book)
+        {
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
+            {
+                conn.Open();
+                string query = @"
+                    INSERT INTO Book (Title, Description, CoverPath, ContentText, AuthorUserId, IsFrozen)
+                    OUTPUT INSERTED.BookId
+                    VALUES (@title, @desc, @cover, @content, @authorId, 0)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@title", book.Title);
+                    cmd.Parameters.AddWithValue("@desc", book.Description ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@cover", string.IsNullOrWhiteSpace(book.CoverPath)
+                        ? "pack://application:,,,/Resources/no_cover.png" : book.CoverPath);
+                    cmd.Parameters.AddWithValue("@content", book.ContentText ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@authorId", book.AuthorUserId);
+
+                    object result = cmd.ExecuteScalar();
+                    return result != null ? (int)result : -1;
+                }
+            }
+        }
+
+        // Сохранить жанры книги
+        public void SaveBookGenres(int bookId, List<int> selectedGenreIds)
+        {
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
+            {
+                conn.Open();
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string deleteQuery = "DELETE FROM BookGenre WHERE BookId = @bookId";
+                        using (SqlCommand cmd = new SqlCommand(deleteQuery, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@bookId", bookId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        foreach (int genreId in selectedGenreIds)
+                        {
+                            string insertQuery = "INSERT INTO BookGenre (BookId, GenreId) VALUES (@bookId, @genreId)";
+                            using (SqlCommand cmd = new SqlCommand(insertQuery, conn, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@bookId", bookId);
+                                cmd.Parameters.AddWithValue("@genreId", genreId);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        // Получить список всех авторов (для выбора при добавлении книги)
+        public List<UserModel> GetAllAuthors()
+        {
+            var users = new List<UserModel>();
+            using (SqlConnection conn = new SqlConnection(cleanConnectionString))
+            {
+                conn.Open();
+                string query = @"
+                    SELECT u.UserId, u.DisplayName, u.Login
+                    FROM Users u
+                    INNER JOIN Role r ON u.RoleId = r.RoleId
+                    WHERE r.Name = 'Author'
+                    ORDER BY u.DisplayName";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        users.Add(new UserModel
+                        {
+                            UserId = reader.GetInt32(0),
+                            DisplayName = reader.GetString(1),
+                            Login = reader.GetString(2)
+                        });
+                    }
+                }
+            }
+            return users;
         }
     }
 }

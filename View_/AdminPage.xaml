@@ -155,6 +155,104 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
+            <TabItem Header="Добавить книгу">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15">
+                    <materialDesign:Card Padding="20" Background="White" UniformCornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Text="Добавление новой книги" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                            <!-- Автор -->
+                            <ComboBox ItemsSource="{Binding Authors}"
+                                      SelectedItem="{Binding SelectedAuthor}"
+                                      DisplayMemberPath="DisplayName"
+                                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                      materialDesign:HintAssist.Hint="Выберите автора"
+                                      Margin="0,0,0,15"/>
+
+                            <!-- Название -->
+                            <TextBox Text="{Binding AdminBookTitle, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="Название книги"
+                                     Margin="0,0,0,15" FontSize="15"/>
+
+                            <!-- Обложка -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding AdminBookCoverPath, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                         materialDesign:HintAssist.Hint="Путь к файлу обложки"
+                                         IsReadOnly="True"/>
+                                <Button Grid.Column="1" Content="📁 Обзор..."
+                                        Command="{Binding AdminBrowseCoverCommand}"
+                                        Height="36" Margin="8,0,0,0" Padding="12,0"/>
+                            </Grid>
+
+                            <!-- Описание -->
+                            <TextBox Text="{Binding AdminBookDescription, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     AcceptsReturn="True" Height="80" TextWrapping="Wrap"
+                                     materialDesign:HintAssist.Hint="Аннотация / Описание книги"
+                                     Margin="0,0,0,15"/>
+
+                            <!-- Текст -->
+                            <TextBlock Text="Текст книги / Главы:" FontSize="14" Foreground="Gray" Margin="0,5,0,5"/>
+                            <TextBox Text="{Binding AdminBookContent, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     AcceptsReturn="True" Height="200" VerticalScrollBarVisibility="Auto"
+                                     TextWrapping="Wrap" AcceptsTab="True"
+                                     materialDesign:HintAssist.Hint="Текст произведения..."
+                                     FontFamily="Consolas" FontSize="13"/>
+
+                            <!-- Жанры -->
+                            <Border Margin="0,15,0,0" BorderBrush="#ddd" BorderThickness="1" CornerRadius="6" Padding="12">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <materialDesign:PackIcon Kind="TagMultiple" Width="20" Height="20"
+                                                                 Foreground="#3F51B5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Жанры книги" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="#3F51B5" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock Text="Отметьте один или несколько жанров:"
+                                               FontSize="12" Foreground="Gray" Margin="0,0,0,8"/>
+                                    <ItemsControl ItemsSource="{Binding AllGenres}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Margin="0,3,8,3" CornerRadius="14" Padding="2,0">
+                                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                                              Content="{Binding Name}"
+                                                              Style="{StaticResource MaterialDesignFilterChipOutlineCheckBox}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Кнопки -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                                <Button Content="Очистить форму"
+                                        Command="{Binding AdminClearFormCommand}"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Margin="0,0,12,0" Height="40" Padding="16,0"/>
+                                <Button Content="Добавить книгу"
+                                        Command="{Binding AdminSaveBookCommand}"
+                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Height="40" Padding="20,0" Background="#3F51B5" BorderBrush="#3F51B5"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </ScrollViewer>
+            </TabItem>
+
         </TabControl>
     </Grid>
 </UserControl>
