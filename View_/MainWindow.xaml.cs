@@ -2,6 +2,7 @@
 using Read_Write_Slowly.ViewModels_;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,11 @@ namespace Read_Write_Slowly
 
             // Привязываем DataContext к MainViewModel, передавая пользователя
             this.DataContext = new MainViewModel(authenticatedUser);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("help.chm");
         }
     }
 }

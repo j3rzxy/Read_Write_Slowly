@@ -126,7 +126,20 @@
                                            FontSize="14"/>
                             </StackPanel>
                         </Button>
-
+                        <Button
+                            Style="{StaticResource MaterialDesignFlatMidBgButton}"
+                                Background="Transparent" BorderBrush="Transparent"
+                                Foreground="White" Height="48"
+                                HorizontalContentAlignment="Left" Margin="0,3" Click="Button_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="AlertCircle"
+                                                         Width="22" Height="22"
+                                                         VerticalAlignment="Center"/>
+                                <TextBlock Text="Справка"
+                                           Margin="15,0,0,0" VerticalAlignment="Center"
+                                           FontSize="14"/>
+                            </StackPanel>
+                        </Button>
                         <!-- Разделитель перед разделами ролей -->
                         <Rectangle Height="1" Fill="#2E2E42" Margin="10,8"/>
 
@@ -165,6 +178,7 @@
                                            FontSize="14"/>
                             </StackPanel>
                         </Button>
+                        
 
                     </StackPanel>
                 </ScrollViewer>
